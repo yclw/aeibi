@@ -4,12 +4,53 @@
 
 package db
 
+type Post struct {
+	ID              int64
+	Uid             string
+	Author          string
+	Text            string
+	Images          string
+	Attachments     string
+	CommentCount    int64
+	CollectionCount int64
+	LikeCount       int64
+	Pinned          int64
+	Visibility      string
+	LatestRepliedOn int64
+	Ip              string
+	Status          string
+	CreatedAt       int64
+	UpdatedAt       int64
+}
+
+type PostCollection struct {
+	PostUid   string
+	UserUid   string
+	CreatedAt int64
+}
+
+type PostLike struct {
+	PostUid   string
+	UserUid   string
+	CreatedAt int64
+}
+
+type PostTag struct {
+	PostID int64
+	TagID  int64
+}
+
 type RefreshToken struct {
 	ID        int64
 	Uid       string
 	Token     string
 	ExpiresAt int64
 	CreatedAt int64
+}
+
+type Tag struct {
+	ID   int64
+	Name string
 }
 
 type User struct {

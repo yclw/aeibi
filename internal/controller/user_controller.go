@@ -57,7 +57,7 @@ func (h *UserHandler) UpdateUser(ctx context.Context, req *api.UpdateUserRequest
 	if req.Uid == "" {
 		return nil, status.Error(codes.InvalidArgument, "uid is required")
 	}
-	if req.Username == nil || req.Role == nil || req.Email == nil || req.Nickname == nil || req.AvatarUrl == nil {
+	if req.Username == nil || req.Email == nil || req.Nickname == nil || req.AvatarUrl == nil {
 		return nil, status.Error(codes.InvalidArgument, "no fields to update")
 	}
 	return h.svc.UpdateUser(ctx, req)
@@ -91,7 +91,7 @@ func (h *UserHandler) UpdateMe(ctx context.Context, req *api.UpdateMeRequest) (*
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "request is nil")
 	}
-	if req.Username == nil || req.Role == nil || req.Email == nil || req.Nickname == nil || req.AvatarUrl == nil {
+	if req.Username == nil || req.Email == nil || req.Nickname == nil || req.AvatarUrl == nil {
 		return nil, status.Error(codes.InvalidArgument, "no fields to update")
 	}
 	uid, ok := auth.SubjectFromContext(ctx)

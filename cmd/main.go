@@ -41,11 +41,11 @@ const (
 	sqliteDSN     = "file:aeibi.db?_pragma=busy_timeout(5000)&cache=shared"
 	migrationsDir = "internal/repository/db/migration"
 
-	minioEndpoint  = ""
-	minioAccessKey = ""
-	minioSecretKey = ""
-	minioBucket    = "aeibi"
-	minioUseSSL    = false
+	ossEndpoint  = ""
+	ossAccessKey = ""
+	ossSecretKey = ""
+	ossBucket    = "aeibi"
+	ossUseSSL    = false
 
 	jwtSecret  = ""
 	jwtIssuer  = ""
@@ -74,13 +74,17 @@ func main() {
 		os.Exit(1)
 	}
 
-	userSvc := service.New(dbConn, ossClient, jwtSecret, jwtIssuer, jwtTTL, refreshTTL)
+	userSvc := service.NewUserService(dbConn, ossClient, jwtSecret, jwtIssuer, jwtTTL, refreshTTL)
 	userHandler := controller.NewUserHandler(userSvc)
+
+	postSvc := service.NewPostService(dbConn, ossClient)
+	postHandler := controller.NewPostHandler(postSvc)
 
 	grpcServer := grpc.NewServer(
 		grpc.UnaryInterceptor(auth.NewAuthUnaryServerInterceptor(jwtSecret)),
 	)
 	api.RegisterUserServiceServer(grpcServer, userHandler)
+	api.RegisterPostServiceServer(grpcServer, postHandler)
 
 	lis, err := net.Listen("tcp", grpcAddr)
 	if err != nil {
@@ -175,9 +179,9 @@ func runMigrations() error {
 }
 
 func initOSS(ctx context.Context) (*oss.OSS, error) {
-	client, err := minio.New(minioEndpoint, &minio.Options{
-		Creds:  credentials.NewStaticV4(minioAccessKey, minioSecretKey, ""),
-		Secure: minioUseSSL,
+	client, err := minio.New(ossEndpoint, &minio.Options{
+		Creds:  credentials.NewStaticV4(ossAccessKey, ossSecretKey, ""),
+		Secure: ossUseSSL,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("init minio client: %w", err)
@@ -186,17 +190,17 @@ func initOSS(ctx context.Context) (*oss.OSS, error) {
 	bucketCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	exists, err := client.BucketExists(bucketCtx, minioBucket)
+	exists, err := client.BucketExists(bucketCtx, ossBucket)
 	if err != nil {
-		return nil, fmt.Errorf("check bucket %q: %w", minioBucket, err)
+		return nil, fmt.Errorf("check bucket %q: %w", ossBucket, err)
 	}
 	if !exists {
-		if err := client.MakeBucket(bucketCtx, minioBucket, minio.MakeBucketOptions{}); err != nil {
-			return nil, fmt.Errorf("create bucket %q: %w", minioBucket, err)
+		if err := client.MakeBucket(bucketCtx, ossBucket, minio.MakeBucketOptions{}); err != nil {
+			return nil, fmt.Errorf("create bucket %q: %w", ossBucket, err)
 		}
 	}
 
-	return oss.New(client, minioBucket), nil
+	return oss.New(client, ossBucket), nil
 }
 
 func assetProxyHandler(ossClient *oss.OSS) http.Handler {

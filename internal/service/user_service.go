@@ -27,7 +27,7 @@ type UserService struct {
 	refreshTTL time.Duration
 }
 
-func New(dbx *sql.DB, ossClient *oss.OSS, jwtSecret, jwtIssuer string, jwtTTL, refreshTTL time.Duration) *UserService {
+func NewUserService(dbx *sql.DB, ossClient *oss.OSS, jwtSecret, jwtIssuer string, jwtTTL, refreshTTL time.Duration) *UserService {
 	return &UserService{
 		db:         db.New(dbx),
 		dbx:        dbx,
@@ -56,7 +56,6 @@ func (s *UserService) CreateUser(ctx context.Context, req *api.CreateUserRequest
 		row, err := qtx.CreateUser(ctx, db.CreateUserParams{
 			Uid:          uid,
 			Username:     req.Username,
-			Role:         req.Role,
 			Email:        req.Email,
 			Nickname:     req.Nickname,
 			PasswordHash: string(passwordHash),
@@ -72,7 +71,6 @@ func (s *UserService) CreateUser(ctx context.Context, req *api.CreateUserRequest
 			User: &api.User{
 				Uid:       row.Uid,
 				Username:  row.Username,
-				Role:      row.Role,
 				Email:     row.Email,
 				Nickname:  row.Nickname,
 				AvatarUrl: row.AvatarUrl,
@@ -169,9 +167,6 @@ func (s *UserService) UpdateUser(ctx context.Context, req *api.UpdateUserRequest
 	if req.Username != nil {
 		params.Username = s.nsPtr(req.Username)
 	}
-	if req.Role != nil {
-		params.Role = s.nsPtr(req.Role)
-	}
 	if req.Email != nil {
 		params.Email = s.nsPtr(req.Email)
 	}
@@ -241,9 +236,6 @@ func (s *UserService) UpdateMe(ctx context.Context, uid string, req *api.UpdateM
 
 	if req.Username != nil {
 		params.Username = s.nsPtr(req.Username)
-	}
-	if req.Role != nil {
-		params.Role = s.nsPtr(req.Role)
 	}
 	if req.Email != nil {
 		params.Email = s.nsPtr(req.Email)

@@ -111,9 +111,8 @@ type CreateUserRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Username      string                 `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
 	Password      string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
-	Role          string                 `protobuf:"bytes,3,opt,name=role,proto3" json:"role,omitempty"`
-	Email         string                 `protobuf:"bytes,4,opt,name=email,proto3" json:"email,omitempty"`
-	Nickname      string                 `protobuf:"bytes,5,opt,name=nickname,proto3" json:"nickname,omitempty"`
+	Email         string                 `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
+	Nickname      string                 `protobuf:"bytes,4,opt,name=nickname,proto3" json:"nickname,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -158,13 +157,6 @@ func (x *CreateUserRequest) GetUsername() string {
 func (x *CreateUserRequest) GetPassword() string {
 	if x != nil {
 		return x.Password
-	}
-	return ""
-}
-
-func (x *CreateUserRequest) GetRole() string {
-	if x != nil {
-		return x.Role
 	}
 	return ""
 }
@@ -447,10 +439,9 @@ type UpdateUserRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Uid           string                 `protobuf:"bytes,1,opt,name=uid,proto3" json:"uid,omitempty"`
 	Username      *string                `protobuf:"bytes,2,opt,name=username,proto3,oneof" json:"username,omitempty"`
-	Role          *string                `protobuf:"bytes,3,opt,name=role,proto3,oneof" json:"role,omitempty"`
-	Email         *string                `protobuf:"bytes,4,opt,name=email,proto3,oneof" json:"email,omitempty"`
-	Nickname      *string                `protobuf:"bytes,5,opt,name=nickname,proto3,oneof" json:"nickname,omitempty"`
-	AvatarUrl     *string                `protobuf:"bytes,6,opt,name=avatar_url,json=avatarUrl,proto3,oneof" json:"avatar_url,omitempty"`
+	Email         *string                `protobuf:"bytes,3,opt,name=email,proto3,oneof" json:"email,omitempty"`
+	Nickname      *string                `protobuf:"bytes,4,opt,name=nickname,proto3,oneof" json:"nickname,omitempty"`
+	AvatarUrl     *string                `protobuf:"bytes,5,opt,name=avatar_url,json=avatarUrl,proto3,oneof" json:"avatar_url,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -495,13 +486,6 @@ func (x *UpdateUserRequest) GetUid() string {
 func (x *UpdateUserRequest) GetUsername() string {
 	if x != nil && x.Username != nil {
 		return *x.Username
-	}
-	return ""
-}
-
-func (x *UpdateUserRequest) GetRole() string {
-	if x != nil && x.Role != nil {
-		return *x.Role
 	}
 	return ""
 }
@@ -661,11 +645,10 @@ func (x *GetMeResponse) GetUser() *User {
 
 type UpdateMeRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Username      *string                `protobuf:"bytes,2,opt,name=username,proto3,oneof" json:"username,omitempty"`
-	Role          *string                `protobuf:"bytes,3,opt,name=role,proto3,oneof" json:"role,omitempty"`
-	Email         *string                `protobuf:"bytes,4,opt,name=email,proto3,oneof" json:"email,omitempty"`
-	Nickname      *string                `protobuf:"bytes,5,opt,name=nickname,proto3,oneof" json:"nickname,omitempty"`
-	AvatarUrl     *string                `protobuf:"bytes,6,opt,name=avatar_url,json=avatarUrl,proto3,oneof" json:"avatar_url,omitempty"`
+	Username      *string                `protobuf:"bytes,1,opt,name=username,proto3,oneof" json:"username,omitempty"`
+	Email         *string                `protobuf:"bytes,2,opt,name=email,proto3,oneof" json:"email,omitempty"`
+	Nickname      *string                `protobuf:"bytes,3,opt,name=nickname,proto3,oneof" json:"nickname,omitempty"`
+	AvatarUrl     *string                `protobuf:"bytes,4,opt,name=avatar_url,json=avatarUrl,proto3,oneof" json:"avatar_url,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -703,13 +686,6 @@ func (*UpdateMeRequest) Descriptor() ([]byte, []int) {
 func (x *UpdateMeRequest) GetUsername() string {
 	if x != nil && x.Username != nil {
 		return *x.Username
-	}
-	return ""
-}
-
-func (x *UpdateMeRequest) GetRole() string {
-	if x != nil && x.Role != nil {
-		return *x.Role
 	}
 	return ""
 }
@@ -1106,13 +1082,12 @@ const file_user_proto_rawDesc = "" +
 	"\x05email\x18\x04 \x01(\tR\x05email\x12\x1a\n" +
 	"\bnickname\x18\x05 \x01(\tR\bnickname\x12\x1d\n" +
 	"\n" +
-	"avatar_url\x18\x06 \x01(\tR\tavatarUrl\"\x91\x01\n" +
+	"avatar_url\x18\x06 \x01(\tR\tavatarUrl\"}\n" +
 	"\x11CreateUserRequest\x12\x1a\n" +
 	"\busername\x18\x01 \x01(\tR\busername\x12\x1a\n" +
-	"\bpassword\x18\x02 \x01(\tR\bpassword\x12\x12\n" +
-	"\x04role\x18\x03 \x01(\tR\x04role\x12\x14\n" +
-	"\x05email\x18\x04 \x01(\tR\x05email\x12\x1a\n" +
-	"\bnickname\x18\x05 \x01(\tR\bnickname\"4\n" +
+	"\bpassword\x18\x02 \x01(\tR\bpassword\x12\x14\n" +
+	"\x05email\x18\x03 \x01(\tR\x05email\x12\x1a\n" +
+	"\bnickname\x18\x04 \x01(\tR\bnickname\"4\n" +
 	"\x12CreateUserResponse\x12\x1e\n" +
 	"\x04user\x18\x01 \x01(\v2\n" +
 	".user.UserR\x04user\"\x81\x01\n" +
@@ -1132,17 +1107,15 @@ const file_user_proto_rawDesc = "" +
 	"\x03uid\x18\x01 \x01(\tR\x03uid\"1\n" +
 	"\x0fGetUserResponse\x12\x1e\n" +
 	"\x04user\x18\x01 \x01(\v2\n" +
-	".user.UserR\x04user\"\xfb\x01\n" +
+	".user.UserR\x04user\"\xd9\x01\n" +
 	"\x11UpdateUserRequest\x12\x10\n" +
 	"\x03uid\x18\x01 \x01(\tR\x03uid\x12\x1f\n" +
-	"\busername\x18\x02 \x01(\tH\x00R\busername\x88\x01\x01\x12\x17\n" +
-	"\x04role\x18\x03 \x01(\tH\x01R\x04role\x88\x01\x01\x12\x19\n" +
-	"\x05email\x18\x04 \x01(\tH\x02R\x05email\x88\x01\x01\x12\x1f\n" +
-	"\bnickname\x18\x05 \x01(\tH\x03R\bnickname\x88\x01\x01\x12\"\n" +
+	"\busername\x18\x02 \x01(\tH\x00R\busername\x88\x01\x01\x12\x19\n" +
+	"\x05email\x18\x03 \x01(\tH\x01R\x05email\x88\x01\x01\x12\x1f\n" +
+	"\bnickname\x18\x04 \x01(\tH\x02R\bnickname\x88\x01\x01\x12\"\n" +
 	"\n" +
-	"avatar_url\x18\x06 \x01(\tH\x04R\tavatarUrl\x88\x01\x01B\v\n" +
-	"\t_usernameB\a\n" +
-	"\x05_roleB\b\n" +
+	"avatar_url\x18\x05 \x01(\tH\x03R\tavatarUrl\x88\x01\x01B\v\n" +
+	"\t_usernameB\b\n" +
 	"\x06_emailB\v\n" +
 	"\t_nicknameB\r\n" +
 	"\v_avatar_url\"4\n" +
@@ -1153,16 +1126,14 @@ const file_user_proto_rawDesc = "" +
 	"\x03uid\x18\x01 \x01(\tR\x03uid\"/\n" +
 	"\rGetMeResponse\x12\x1e\n" +
 	"\x04user\x18\x01 \x01(\v2\n" +
-	".user.UserR\x04user\"\xe7\x01\n" +
+	".user.UserR\x04user\"\xc5\x01\n" +
 	"\x0fUpdateMeRequest\x12\x1f\n" +
-	"\busername\x18\x02 \x01(\tH\x00R\busername\x88\x01\x01\x12\x17\n" +
-	"\x04role\x18\x03 \x01(\tH\x01R\x04role\x88\x01\x01\x12\x19\n" +
-	"\x05email\x18\x04 \x01(\tH\x02R\x05email\x88\x01\x01\x12\x1f\n" +
-	"\bnickname\x18\x05 \x01(\tH\x03R\bnickname\x88\x01\x01\x12\"\n" +
+	"\busername\x18\x01 \x01(\tH\x00R\busername\x88\x01\x01\x12\x19\n" +
+	"\x05email\x18\x02 \x01(\tH\x01R\x05email\x88\x01\x01\x12\x1f\n" +
+	"\bnickname\x18\x03 \x01(\tH\x02R\bnickname\x88\x01\x01\x12\"\n" +
 	"\n" +
-	"avatar_url\x18\x06 \x01(\tH\x04R\tavatarUrl\x88\x01\x01B\v\n" +
-	"\t_usernameB\a\n" +
-	"\x05_roleB\b\n" +
+	"avatar_url\x18\x04 \x01(\tH\x03R\tavatarUrl\x88\x01\x01B\v\n" +
+	"\t_usernameB\b\n" +
 	"\x06_emailB\v\n" +
 	"\t_nicknameB\r\n" +
 	"\v_avatar_url\"2\n" +

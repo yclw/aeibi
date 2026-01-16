@@ -2,7 +2,6 @@
 INSERT INTO users (
   uid,
   username,
-  role,
   email,
   nickname,
   password_hash,
@@ -10,10 +9,6 @@ INSERT INTO users (
 ) VALUES (
   sqlc.arg(uid),
   sqlc.arg(username),
-  CASE
-    WHEN LENGTH(CAST(sqlc.arg(role) AS TEXT)) = 0 THEN 'USER'
-    ELSE CAST(sqlc.arg(role) AS TEXT)
-  END,
   sqlc.arg(email),
   sqlc.arg(nickname),
   sqlc.arg(password_hash),
@@ -88,7 +83,6 @@ WHERE status = 'NORMAL'
 UPDATE users
 SET
   username   = COALESCE(sqlc.narg(username), username),
-  role       = COALESCE(sqlc.narg(role), role),
   email      = COALESCE(sqlc.narg(email), email),
   nickname   = COALESCE(sqlc.narg(nickname), nickname),
   avatar_url = COALESCE(sqlc.narg(avatar_url), avatar_url),

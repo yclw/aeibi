@@ -50,7 +50,6 @@ const createUser = `-- name: CreateUser :one
 INSERT INTO users (
   uid,
   username,
-  role,
   email,
   nickname,
   password_hash,
@@ -58,14 +57,10 @@ INSERT INTO users (
 ) VALUES (
   ?1,
   ?2,
-  CASE
-    WHEN LENGTH(CAST(?3 AS TEXT)) = 0 THEN 'USER'
-    ELSE CAST(?3 AS TEXT)
-  END,
+  ?3,
   ?4,
   ?5,
-  ?6,
-  ?7
+  ?6
 ) RETURNING
   uid,
   username,
@@ -78,7 +73,6 @@ INSERT INTO users (
 type CreateUserParams struct {
 	Uid          string
 	Username     string
-	Role         string
 	Email        string
 	Nickname     string
 	PasswordHash string
@@ -98,7 +92,6 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (CreateU
 	row := q.db.QueryRowContext(ctx, createUser,
 		arg.Uid,
 		arg.Username,
-		arg.Role,
 		arg.Email,
 		arg.Nickname,
 		arg.PasswordHash,
@@ -278,19 +271,17 @@ const updateUserByUid = `-- name: UpdateUserByUid :one
 UPDATE users
 SET
   username   = COALESCE(?1, username),
-  role       = COALESCE(?2, role),
-  email      = COALESCE(?3, email),
-  nickname   = COALESCE(?4, nickname),
-  avatar_url = COALESCE(?5, avatar_url),
+  email      = COALESCE(?2, email),
+  nickname   = COALESCE(?3, nickname),
+  avatar_url = COALESCE(?4, avatar_url),
   updated_at = unixepoch()
-WHERE uid = ?6
+WHERE uid = ?5
   AND status = 'NORMAL'
 RETURNING uid, username, role, email, nickname, avatar_url
 `
 
 type UpdateUserByUidParams struct {
 	Username  sql.NullString
-	Role      sql.NullString
 	Email     sql.NullString
 	Nickname  sql.NullString
 	AvatarUrl sql.NullString
@@ -309,7 +300,6 @@ type UpdateUserByUidRow struct {
 func (q *Queries) UpdateUserByUid(ctx context.Context, arg UpdateUserByUidParams) (UpdateUserByUidRow, error) {
 	row := q.db.QueryRowContext(ctx, updateUserByUid,
 		arg.Username,
-		arg.Role,
 		arg.Email,
 		arg.Nickname,
 		arg.AvatarUrl,

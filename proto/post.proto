@@ -1,0 +1,191 @@
+syntax = "proto3";
+
+package post;
+
+option go_package = "aeibi/api;api";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+// PostService
+service PostService {
+  // POST /api/v1/posts 创建帖子
+  rpc CreatePost(CreatePostRequest) returns (CreatePostResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/posts"
+      body: "*"
+    };
+  }
+
+  // GET /api/v1/posts 列表（公开）
+  rpc ListPosts(ListPostsRequest) returns (ListPostsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/posts"
+    };
+  }
+
+  // GET /api/v1/me/posts 当前用户发布的列表（含 PRIVATE）
+  rpc ListMyPosts(ListPostsRequest) returns (ListPostsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/me/posts"
+    };
+  }
+
+  // GET /api/v1/me/collections 当前用户收藏的帖子列表
+  rpc ListMyCollections(ListPostsRequest) returns (ListPostsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/me/collections"
+    };
+  }
+
+  // GET /api/v1/posts/{uid} 详情
+  rpc GetPost(GetPostRequest) returns (GetPostResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/posts/{uid}"
+    };
+  }
+
+  // GET /api/v1/me/posts/{uid} 当前用户的帖子详情（含 PRIVATE）
+  rpc GetMyPost(GetPostRequest) returns (GetPostResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/me/posts/{uid}"
+    };
+  }
+
+  // PATCH /api/v1/posts/{uid} 更新正文/媒体/标签/可见性
+  rpc UpdatePost(UpdatePostRequest) returns (UpdatePostResponse) {
+    option (google.api.http) = {
+      patch: "/api/v1/posts/{uid}"
+      body : "*"
+    };
+  }
+
+  // DELETE /api/v1/posts/{uid} 软删
+  rpc DeletePost(DeletePostRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/api/v1/posts/{uid}"
+    };
+  }
+
+  // POST /api/v1/posts/{uid}/like 点赞或取消赞
+  rpc LikePost(LikePostRequest) returns (PostCounterResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/posts/{uid}/like"
+      body: "*"
+    };
+  }
+
+  // POST /api/v1/posts/{uid}/collect 收藏或取消收藏
+  rpc CollectPost(CollectPostRequest) returns (PostCounterResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/posts/{uid}/collect"
+      body: "*"
+    };
+  }
+}
+
+// -------------------- Messages --------------------
+
+message Post {
+  string          uid               = 1;
+  string          author            = 2;
+  string          text              = 3;
+  repeated string images            = 4;
+  repeated string attachments       = 5;
+  repeated string tags              = 6;
+  int64           comment_count     = 7;
+  int64           collection_count  = 8;
+  int64           like_count        = 9;
+  string          visibility        = 10;
+  int64           latest_replied_on = 11;
+  string          ip                = 12;
+  bool            pinned            = 13;
+  int64           created_at        = 14;
+  int64           updated_at        = 15;
+}
+
+enum ToggleAction {
+  TOGGLE_ACTION_UNSPECIFIED = 0;
+  TOGGLE_ACTION_ADD         = 1;
+  TOGGLE_ACTION_REMOVE      = 2;
+}
+
+// Create
+
+message CreatePostRequest {
+  string          text        = 1;
+  repeated string images      = 2;
+  repeated string attachments = 3;
+  repeated string tags        = 4;
+  string          visibility  = 5;
+  bool            pinned      = 6;
+}
+
+message CreatePostResponse {
+  Post post = 1;
+}
+
+// List
+
+message ListPostsRequest {
+  int32          page_size  = 1;
+  string         page_token = 2;
+  string         author     = 3;
+  string         tag        = 4;
+  string         visibility = 5;
+  string         search     = 6;
+}
+
+message ListPostsResponse {
+  repeated Post posts           = 1;
+  string        next_page_token = 2;
+  int64         total_size      = 3;
+}
+
+// Get
+
+message GetPostRequest {
+  string uid = 1;
+}
+
+message GetPostResponse {
+  Post post = 1;
+}
+
+// Update
+
+message UpdatePostRequest {
+  string                  uid         = 1;
+  optional string         text        = 2;
+  repeated string         images      = 3;
+  repeated string         attachments = 4;
+  repeated string         tags        = 5;
+  optional string         visibility  = 6;
+  optional bool           pinned      = 7;
+}
+
+message UpdatePostResponse {
+  Post post = 1;
+}
+
+// Delete
+
+message DeletePostRequest {
+  string uid = 1;
+}
+
+// Like / Collect
+
+message LikePostRequest {
+  string       uid    = 1;
+  ToggleAction action = 2;
+}
+
+message CollectPostRequest {
+  string       uid    = 1;
+  ToggleAction action = 2;
+}
+
+message PostCounterResponse {
+  Post post = 1;
+}

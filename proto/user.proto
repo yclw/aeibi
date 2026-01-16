@@ -102,9 +102,8 @@ message User {
 message CreateUserRequest {
   string username = 1;
   string password = 2;
-  string role     = 3;
-  string email    = 4;
-  string nickname = 5;
+  string email    = 3;
+  string nickname = 4;
 }
 
 message CreateUserResponse {
@@ -141,10 +140,9 @@ message GetUserResponse {
 message UpdateUserRequest {
   string uid = 1;
   optional string username   = 2;
-  optional string role       = 3;
-  optional string email      = 4;
-  optional string nickname   = 5;
-  optional string avatar_url = 6;
+  optional string email      = 3;
+  optional string nickname   = 4;
+  optional string avatar_url = 5;
 }
 
 message UpdateUserResponse {
@@ -164,11 +162,10 @@ message GetMeResponse {
 }
 
 message UpdateMeRequest {
-  optional string username   = 2;
-  optional string role       = 3;
-  optional string email      = 4;
-  optional string nickname   = 5;
-  optional string avatar_url = 6;
+  optional string username   = 1;
+  optional string email      = 2;
+  optional string nickname   = 3;
+  optional string avatar_url = 4;
 }
 
 message UpdateMeResponse {

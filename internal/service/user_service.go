@@ -324,10 +324,10 @@ func (s *UserService) Login(ctx context.Context, req *api.LoginRequest) (*api.Lo
 	return resp, nil
 }
 
-func (s *UserService) RefreshToken(ctx context.Context, uid string, req *api.RefreshTokenRequest) (*api.RefreshTokenResponse, error) {
+func (s *UserService) RefreshToken(ctx context.Context, req *api.RefreshTokenRequest) (*api.RefreshTokenResponse, error) {
 	var resp *api.RefreshTokenResponse
 	if err := db.WithTx(ctx, s.dbx, s.db, func(qtx *db.Queries) error {
-		row, err := qtx.GetRefreshToken(ctx, uid)
+		row, err := qtx.GetRefreshTokenByToken(ctx, req.RefreshToken)
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
 				return fmt.Errorf("invalid refresh token")
@@ -335,15 +335,12 @@ func (s *UserService) RefreshToken(ctx context.Context, uid string, req *api.Ref
 			return fmt.Errorf("get refresh token: %w", err)
 		}
 
-		if row.Token != req.RefreshToken {
-			return fmt.Errorf("invalid refresh token")
-		}
-
 		now := time.Now()
 		if now.Unix() >= row.ExpiresAt {
 			return fmt.Errorf("refresh token expired")
 		}
 
+		uid := row.Uid
 		accessToken, refreshToken, err := s.genToken(uid)
 		if err != nil {
 			return err

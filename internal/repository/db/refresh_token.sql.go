@@ -45,6 +45,36 @@ func (q *Queries) GetRefreshToken(ctx context.Context, uid string) (GetRefreshTo
 	return i, err
 }
 
+const getRefreshTokenByToken = `-- name: GetRefreshTokenByToken :one
+SELECT
+  uid,
+  token,
+  created_at,
+  expires_at
+FROM refresh_tokens
+WHERE token = ?1
+LIMIT 1
+`
+
+type GetRefreshTokenByTokenRow struct {
+	Uid       string
+	Token     string
+	CreatedAt int64
+	ExpiresAt int64
+}
+
+func (q *Queries) GetRefreshTokenByToken(ctx context.Context, token string) (GetRefreshTokenByTokenRow, error) {
+	row := q.db.QueryRowContext(ctx, getRefreshTokenByToken, token)
+	var i GetRefreshTokenByTokenRow
+	err := row.Scan(
+		&i.Uid,
+		&i.Token,
+		&i.CreatedAt,
+		&i.ExpiresAt,
+	)
+	return i, err
+}
+
 const upsertRefreshToken = `-- name: UpsertRefreshToken :one
 INSERT INTO refresh_tokens (
   uid,

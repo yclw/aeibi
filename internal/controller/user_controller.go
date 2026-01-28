@@ -124,14 +124,7 @@ func (h *UserHandler) RefreshToken(ctx context.Context, req *api.RefreshTokenReq
 	if req.RefreshToken == "" {
 		return nil, status.Error(codes.InvalidArgument, "refresh_token is required")
 	}
-	uid, ok := auth.SubjectFromContext(ctx)
-	if !ok {
-		return nil, status.Error(codes.Unauthenticated, "unauthenticated")
-	}
-	if uid == "" {
-		return nil, status.Error(codes.Unauthenticated, "unauthenticated")
-	}
-	return h.svc.RefreshToken(ctx, uid, req)
+	return h.svc.RefreshToken(ctx, req)
 }
 
 func (h *UserHandler) ChangePassword(ctx context.Context, req *api.ChangePasswordRequest) (*emptypb.Empty, error) {

@@ -23,7 +23,7 @@ func NewAuthUnaryServerInterceptor(secret string) grpc.UnaryServerInterceptor {
 		}
 		claims, err := util.ParseJWT(accessToken, secret)
 		authInfo := AuthInfo{
-			Subject: "TOURIST",
+			Subject: "",
 			Object:  info.FullMethod,
 			Action:  "CALL",
 		}

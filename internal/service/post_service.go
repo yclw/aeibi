@@ -76,26 +76,31 @@ func (s *PostService) CreatePost(ctx context.Context, uid string, req *api.Creat
 			return fmt.Errorf("list tags: %w", err)
 		}
 
-		post := &api.Post{
-			Uid:             postRow.Uid,
-			Author:          postRow.Author,
-			Text:            postRow.Text,
-			Tags:            tags,
-			CommentCount:    postRow.CommentCount,
-			CollectionCount: postRow.CollectionCount,
-			LikeCount:       postRow.LikeCount,
-			Visibility:      postRow.Visibility,
-			LatestRepliedOn: postRow.LatestRepliedOn,
-			Ip:              postRow.Ip,
-			Pinned:          postRow.Pinned == 1,
-			CreatedAt:       postRow.CreatedAt,
-			UpdatedAt:       postRow.UpdatedAt,
+		postRowWithAuthor, err := qtx.GetPostByUid(ctx, postRow.Uid)
+		if err != nil {
+			return fmt.Errorf("get post: %w", err)
 		}
-		post.Images, err = util.DecodeStringSlice(postRow.Images)
+
+		post := &api.Post{
+			Uid:             postRowWithAuthor.Uid,
+			Author:          s.postAuthor(postRowWithAuthor.Author, postRowWithAuthor.AuthorNickname, postRowWithAuthor.AuthorAvatarUrl),
+			Text:            postRowWithAuthor.Text,
+			Tags:            tags,
+			CommentCount:    postRowWithAuthor.CommentCount,
+			CollectionCount: postRowWithAuthor.CollectionCount,
+			LikeCount:       postRowWithAuthor.LikeCount,
+			Visibility:      postRowWithAuthor.Visibility,
+			LatestRepliedOn: postRowWithAuthor.LatestRepliedOn,
+			Ip:              postRowWithAuthor.Ip,
+			Pinned:          postRowWithAuthor.Pinned == 1,
+			CreatedAt:       postRowWithAuthor.CreatedAt,
+			UpdatedAt:       postRowWithAuthor.UpdatedAt,
+		}
+		post.Images, err = util.DecodeStringSlice(postRowWithAuthor.Images)
 		if err != nil {
 			return fmt.Errorf("decode images: %w", err)
 		}
-		post.Attachments, err = util.DecodeStringSlice(postRow.Attachments)
+		post.Attachments, err = util.DecodeStringSlice(postRowWithAuthor.Attachments)
 		if err != nil {
 			return fmt.Errorf("decode attachments: %w", err)
 		}
@@ -158,7 +163,7 @@ func (s *PostService) ListPosts(ctx context.Context, req *api.ListPostsRequest) 
 
 		post := &api.Post{
 			Uid:             row.Uid,
-			Author:          row.Author,
+			Author:          s.postAuthor(row.Author, row.AuthorNickname, row.AuthorAvatarUrl),
 			Text:            row.Text,
 			CommentCount:    row.CommentCount,
 			CollectionCount: row.CollectionCount,
@@ -244,7 +249,7 @@ func (s *PostService) ListMyPosts(ctx context.Context, uid string, req *api.List
 
 		post := &api.Post{
 			Uid:             row.Uid,
-			Author:          row.Author,
+			Author:          s.postAuthor(row.Author, row.AuthorNickname, row.AuthorAvatarUrl),
 			Text:            row.Text,
 			CommentCount:    row.CommentCount,
 			CollectionCount: row.CollectionCount,
@@ -332,7 +337,7 @@ func (s *PostService) ListMyCollections(ctx context.Context, uid string, req *ap
 
 		post := &api.Post{
 			Uid:             row.Uid,
-			Author:          row.Author,
+			Author:          s.postAuthor(row.Author, row.AuthorNickname, row.AuthorAvatarUrl),
 			Text:            row.Text,
 			CommentCount:    row.CommentCount,
 			CollectionCount: row.CollectionCount,
@@ -384,7 +389,7 @@ func (s *PostService) GetPost(ctx context.Context, req *api.GetPostRequest) (*ap
 
 	post := &api.Post{
 		Uid:             row.Uid,
-		Author:          row.Author,
+		Author:          s.postAuthor(row.Author, row.AuthorNickname, row.AuthorAvatarUrl),
 		Text:            row.Text,
 		CommentCount:    row.CommentCount,
 		CollectionCount: row.CollectionCount,
@@ -429,7 +434,7 @@ func (s *PostService) GetMyPost(ctx context.Context, uid string, req *api.GetPos
 
 	post := &api.Post{
 		Uid:             row.Uid,
-		Author:          row.Author,
+		Author:          s.postAuthor(row.Author, row.AuthorNickname, row.AuthorAvatarUrl),
 		Text:            row.Text,
 		CommentCount:    row.CommentCount,
 		CollectionCount: row.CollectionCount,
@@ -521,27 +526,32 @@ func (s *PostService) UpdatePost(ctx context.Context, uid string, req *api.Updat
 			return fmt.Errorf("list tags: %w", err)
 		}
 
+		postRow, err := qtx.GetPostByUid(ctx, req.Uid)
+		if err != nil {
+			return fmt.Errorf("get post: %w", err)
+		}
+
 		post := &api.Post{
-			Uid:             updated.Uid,
-			Author:          updated.Author,
-			Text:            updated.Text,
-			CommentCount:    updated.CommentCount,
-			CollectionCount: updated.CollectionCount,
-			LikeCount:       updated.LikeCount,
-			Visibility:      updated.Visibility,
-			LatestRepliedOn: updated.LatestRepliedOn,
-			Ip:              updated.Ip,
-			Pinned:          updated.Pinned == 1,
-			CreatedAt:       updated.CreatedAt,
-			UpdatedAt:       updated.UpdatedAt,
+			Uid:             postRow.Uid,
+			Author:          s.postAuthor(postRow.Author, postRow.AuthorNickname, postRow.AuthorAvatarUrl),
+			Text:            postRow.Text,
+			CommentCount:    postRow.CommentCount,
+			CollectionCount: postRow.CollectionCount,
+			LikeCount:       postRow.LikeCount,
+			Visibility:      postRow.Visibility,
+			LatestRepliedOn: postRow.LatestRepliedOn,
+			Ip:              postRow.Ip,
+			Pinned:          postRow.Pinned == 1,
+			CreatedAt:       postRow.CreatedAt,
+			UpdatedAt:       postRow.UpdatedAt,
 			Tags:            tags,
 		}
 
-		post.Images, err = util.DecodeStringSlice(updated.Images)
+		post.Images, err = util.DecodeStringSlice(postRow.Images)
 		if err != nil {
 			return fmt.Errorf("decode images: %w", err)
 		}
-		post.Attachments, err = util.DecodeStringSlice(updated.Attachments)
+		post.Attachments, err = util.DecodeStringSlice(postRow.Attachments)
 		if err != nil {
 			return fmt.Errorf("decode attachments: %w", err)
 		}
@@ -624,7 +634,7 @@ func (s *PostService) LikePost(ctx context.Context, uid string, req *api.LikePos
 
 		post := &api.Post{
 			Uid:             postRow.Uid,
-			Author:          postRow.Author,
+			Author:          s.postAuthor(postRow.Author, postRow.AuthorNickname, postRow.AuthorAvatarUrl),
 			Text:            postRow.Text,
 			CommentCount:    postRow.CommentCount,
 			CollectionCount: postRow.CollectionCount,
@@ -708,7 +718,7 @@ func (s *PostService) CollectPost(ctx context.Context, uid string, req *api.Coll
 
 		post := &api.Post{
 			Uid:             postRow.Uid,
-			Author:          postRow.Author,
+			Author:          s.postAuthor(postRow.Author, postRow.AuthorNickname, postRow.AuthorAvatarUrl),
 			Text:            postRow.Text,
 			CommentCount:    postRow.CommentCount,
 			CollectionCount: postRow.CollectionCount,
@@ -738,6 +748,14 @@ func (s *PostService) CollectPost(ctx context.Context, uid string, req *api.Coll
 	}
 
 	return resp, nil
+}
+
+func (s *PostService) postAuthor(uid, nickname, avatarURL string) *api.PostAuthor {
+	return &api.PostAuthor{
+		Uid:       uid,
+		Nickname:  nickname,
+		AvatarUrl: avatarURL,
+	}
 }
 
 func (s *PostService) nsPtr(p *string) sql.NullString {

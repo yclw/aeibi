@@ -1148,7 +1148,7 @@
           "readOnly": true
         },
         "author": {
-          "type": "string",
+          "$ref": "#/definitions/postPostAuthor",
           "readOnly": true
         },
         "text": {
@@ -1235,6 +1235,28 @@
         "pinned",
         "createdAt",
         "updatedAt"
+      ]
+    },
+    "postPostAuthor": {
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "readOnly": true
+        },
+        "nickname": {
+          "type": "string",
+          "readOnly": true
+        },
+        "avatarUrl": {
+          "type": "string",
+          "readOnly": true
+        }
+      },
+      "required": [
+        "uid",
+        "nickname",
+        "avatarUrl"
       ]
     },
     "postPostCounterResponse": {

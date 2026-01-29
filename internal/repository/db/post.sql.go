@@ -329,31 +329,55 @@ func (q *Queries) DeletePostTags(ctx context.Context, postID int64) error {
 
 const getPostByUid = `-- name: GetPostByUid :one
 SELECT
-  id,
-  uid,
-  author,
-  text,
-  images,
-  attachments,
-  comment_count,
-  collection_count,
-  like_count,
-  pinned,
-  visibility,
-  latest_replied_on,
-  ip,
-  status,
-  created_at,
-  updated_at
-FROM posts
-WHERE uid = ?1
-  AND status = 'NORMAL'
+  p.id,
+  p.uid,
+  p.author,
+  p.text,
+  p.images,
+  p.attachments,
+  p.comment_count,
+  p.collection_count,
+  p.like_count,
+  p.pinned,
+  p.visibility,
+  p.latest_replied_on,
+  p.ip,
+  p.status,
+  p.created_at,
+  p.updated_at,
+  COALESCE(u.nickname, '') AS author_nickname,
+  COALESCE(u.avatar_url, '') AS author_avatar_url
+FROM posts p
+LEFT JOIN users u ON u.uid = p.author
+WHERE p.uid = ?1
+  AND p.status = 'NORMAL'
 LIMIT 1
 `
 
-func (q *Queries) GetPostByUid(ctx context.Context, uid string) (Post, error) {
+type GetPostByUidRow struct {
+	ID              int64
+	Uid             string
+	Author          string
+	Text            string
+	Images          string
+	Attachments     string
+	CommentCount    int64
+	CollectionCount int64
+	LikeCount       int64
+	Pinned          int64
+	Visibility      string
+	LatestRepliedOn int64
+	Ip              string
+	Status          string
+	CreatedAt       int64
+	UpdatedAt       int64
+	AuthorNickname  string
+	AuthorAvatarUrl string
+}
+
+func (q *Queries) GetPostByUid(ctx context.Context, uid string) (GetPostByUidRow, error) {
 	row := q.db.QueryRowContext(ctx, getPostByUid, uid)
-	var i Post
+	var i GetPostByUidRow
 	err := row.Scan(
 		&i.ID,
 		&i.Uid,
@@ -371,32 +395,37 @@ func (q *Queries) GetPostByUid(ctx context.Context, uid string) (Post, error) {
 		&i.Status,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.AuthorNickname,
+		&i.AuthorAvatarUrl,
 	)
 	return i, err
 }
 
 const getPostByUidAndAuthor = `-- name: GetPostByUidAndAuthor :one
 SELECT
-  id,
-  uid,
-  author,
-  text,
-  images,
-  attachments,
-  comment_count,
-  collection_count,
-  like_count,
-  pinned,
-  visibility,
-  latest_replied_on,
-  ip,
-  status,
-  created_at,
-  updated_at
-FROM posts
-WHERE uid = ?1
-  AND author = ?2
-  AND status = 'NORMAL'
+  p.id,
+  p.uid,
+  p.author,
+  p.text,
+  p.images,
+  p.attachments,
+  p.comment_count,
+  p.collection_count,
+  p.like_count,
+  p.pinned,
+  p.visibility,
+  p.latest_replied_on,
+  p.ip,
+  p.status,
+  p.created_at,
+  p.updated_at,
+  COALESCE(u.nickname, '') AS author_nickname,
+  COALESCE(u.avatar_url, '') AS author_avatar_url
+FROM posts p
+LEFT JOIN users u ON u.uid = p.author
+WHERE p.uid = ?1
+  AND p.author = ?2
+  AND p.status = 'NORMAL'
 LIMIT 1
 `
 
@@ -405,9 +434,30 @@ type GetPostByUidAndAuthorParams struct {
 	Author string
 }
 
-func (q *Queries) GetPostByUidAndAuthor(ctx context.Context, arg GetPostByUidAndAuthorParams) (Post, error) {
+type GetPostByUidAndAuthorRow struct {
+	ID              int64
+	Uid             string
+	Author          string
+	Text            string
+	Images          string
+	Attachments     string
+	CommentCount    int64
+	CollectionCount int64
+	LikeCount       int64
+	Pinned          int64
+	Visibility      string
+	LatestRepliedOn int64
+	Ip              string
+	Status          string
+	CreatedAt       int64
+	UpdatedAt       int64
+	AuthorNickname  string
+	AuthorAvatarUrl string
+}
+
+func (q *Queries) GetPostByUidAndAuthor(ctx context.Context, arg GetPostByUidAndAuthorParams) (GetPostByUidAndAuthorRow, error) {
 	row := q.db.QueryRowContext(ctx, getPostByUidAndAuthor, arg.Uid, arg.Author)
-	var i Post
+	var i GetPostByUidAndAuthorRow
 	err := row.Scan(
 		&i.ID,
 		&i.Uid,
@@ -425,38 +475,64 @@ func (q *Queries) GetPostByUidAndAuthor(ctx context.Context, arg GetPostByUidAnd
 		&i.Status,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.AuthorNickname,
+		&i.AuthorAvatarUrl,
 	)
 	return i, err
 }
 
 const getPublicPostByUid = `-- name: GetPublicPostByUid :one
 SELECT
-  id,
-  uid,
-  author,
-  text,
-  images,
-  attachments,
-  comment_count,
-  collection_count,
-  like_count,
-  pinned,
-  visibility,
-  latest_replied_on,
-  ip,
-  status,
-  created_at,
-  updated_at
-FROM posts
-WHERE uid = ?1
-  AND visibility = 'PUBLIC'
-  AND status = 'NORMAL'
+  p.id,
+  p.uid,
+  p.author,
+  p.text,
+  p.images,
+  p.attachments,
+  p.comment_count,
+  p.collection_count,
+  p.like_count,
+  p.pinned,
+  p.visibility,
+  p.latest_replied_on,
+  p.ip,
+  p.status,
+  p.created_at,
+  p.updated_at,
+  COALESCE(u.nickname, '') AS author_nickname,
+  COALESCE(u.avatar_url, '') AS author_avatar_url
+FROM posts p
+LEFT JOIN users u ON u.uid = p.author
+WHERE p.uid = ?1
+  AND p.visibility = 'PUBLIC'
+  AND p.status = 'NORMAL'
 LIMIT 1
 `
 
-func (q *Queries) GetPublicPostByUid(ctx context.Context, uid string) (Post, error) {
+type GetPublicPostByUidRow struct {
+	ID              int64
+	Uid             string
+	Author          string
+	Text            string
+	Images          string
+	Attachments     string
+	CommentCount    int64
+	CollectionCount int64
+	LikeCount       int64
+	Pinned          int64
+	Visibility      string
+	LatestRepliedOn int64
+	Ip              string
+	Status          string
+	CreatedAt       int64
+	UpdatedAt       int64
+	AuthorNickname  string
+	AuthorAvatarUrl string
+}
+
+func (q *Queries) GetPublicPostByUid(ctx context.Context, uid string) (GetPublicPostByUidRow, error) {
 	row := q.db.QueryRowContext(ctx, getPublicPostByUid, uid)
-	var i Post
+	var i GetPublicPostByUidRow
 	err := row.Scan(
 		&i.ID,
 		&i.Uid,
@@ -474,6 +550,8 @@ func (q *Queries) GetPublicPostByUid(ctx context.Context, uid string) (Post, err
 		&i.Status,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.AuthorNickname,
+		&i.AuthorAvatarUrl,
 	)
 	return i, err
 }
@@ -541,9 +619,12 @@ SELECT
   p.ip,
   p.status,
   p.created_at,
-  p.updated_at
+  p.updated_at,
+  COALESCE(u.nickname, '') AS author_nickname,
+  COALESCE(u.avatar_url, '') AS author_avatar_url
 FROM post_collections pc
 JOIN posts p ON p.uid = pc.post_uid
+LEFT JOIN users u ON u.uid = p.author
 WHERE pc.user_uid = ?1
   AND p.status = 'NORMAL'
   AND (p.visibility = 'PUBLIC' OR p.author = ?1)
@@ -584,7 +665,28 @@ type ListMyCollectionsParams struct {
 	Limit      int64
 }
 
-func (q *Queries) ListMyCollections(ctx context.Context, arg ListMyCollectionsParams) ([]Post, error) {
+type ListMyCollectionsRow struct {
+	ID              int64
+	Uid             string
+	Author          string
+	Text            string
+	Images          string
+	Attachments     string
+	CommentCount    int64
+	CollectionCount int64
+	LikeCount       int64
+	Pinned          int64
+	Visibility      string
+	LatestRepliedOn int64
+	Ip              string
+	Status          string
+	CreatedAt       int64
+	UpdatedAt       int64
+	AuthorNickname  string
+	AuthorAvatarUrl string
+}
+
+func (q *Queries) ListMyCollections(ctx context.Context, arg ListMyCollectionsParams) ([]ListMyCollectionsRow, error) {
 	rows, err := q.db.QueryContext(ctx, listMyCollections,
 		arg.UserUid,
 		arg.Author,
@@ -598,9 +700,9 @@ func (q *Queries) ListMyCollections(ctx context.Context, arg ListMyCollectionsPa
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Post
+	var items []ListMyCollectionsRow
 	for rows.Next() {
-		var i Post
+		var i ListMyCollectionsRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Uid,
@@ -618,6 +720,8 @@ func (q *Queries) ListMyCollections(ctx context.Context, arg ListMyCollectionsPa
 			&i.Status,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.AuthorNickname,
+			&i.AuthorAvatarUrl,
 		); err != nil {
 			return nil, err
 		}
@@ -649,8 +753,11 @@ SELECT
   p.ip,
   p.status,
   p.created_at,
-  p.updated_at
+  p.updated_at,
+  COALESCE(u.nickname, '') AS author_nickname,
+  COALESCE(u.avatar_url, '') AS author_avatar_url
 FROM posts p
+LEFT JOIN users u ON u.uid = p.author
 WHERE p.status = 'NORMAL'
   AND p.author = ?1
   AND (
@@ -685,7 +792,28 @@ type ListMyPostsParams struct {
 	Limit      int64
 }
 
-func (q *Queries) ListMyPosts(ctx context.Context, arg ListMyPostsParams) ([]Post, error) {
+type ListMyPostsRow struct {
+	ID              int64
+	Uid             string
+	Author          string
+	Text            string
+	Images          string
+	Attachments     string
+	CommentCount    int64
+	CollectionCount int64
+	LikeCount       int64
+	Pinned          int64
+	Visibility      string
+	LatestRepliedOn int64
+	Ip              string
+	Status          string
+	CreatedAt       int64
+	UpdatedAt       int64
+	AuthorNickname  string
+	AuthorAvatarUrl string
+}
+
+func (q *Queries) ListMyPosts(ctx context.Context, arg ListMyPostsParams) ([]ListMyPostsRow, error) {
 	rows, err := q.db.QueryContext(ctx, listMyPosts,
 		arg.Author,
 		arg.Visibility,
@@ -698,9 +826,9 @@ func (q *Queries) ListMyPosts(ctx context.Context, arg ListMyPostsParams) ([]Pos
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Post
+	var items []ListMyPostsRow
 	for rows.Next() {
-		var i Post
+		var i ListMyPostsRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Uid,
@@ -718,6 +846,8 @@ func (q *Queries) ListMyPosts(ctx context.Context, arg ListMyPostsParams) ([]Pos
 			&i.Status,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.AuthorNickname,
+			&i.AuthorAvatarUrl,
 		); err != nil {
 			return nil, err
 		}
@@ -781,8 +911,11 @@ SELECT
   p.ip,
   p.status,
   p.created_at,
-  p.updated_at
+  p.updated_at,
+  COALESCE(u.nickname, '') AS author_nickname,
+  COALESCE(u.avatar_url, '') AS author_avatar_url
 FROM posts p
+LEFT JOIN users u ON u.uid = p.author
 WHERE p.status = 'NORMAL'
   AND p.visibility = 'PUBLIC'
   AND (
@@ -821,7 +954,28 @@ type ListPublicPostsParams struct {
 	Limit      int64
 }
 
-func (q *Queries) ListPublicPosts(ctx context.Context, arg ListPublicPostsParams) ([]Post, error) {
+type ListPublicPostsRow struct {
+	ID              int64
+	Uid             string
+	Author          string
+	Text            string
+	Images          string
+	Attachments     string
+	CommentCount    int64
+	CollectionCount int64
+	LikeCount       int64
+	Pinned          int64
+	Visibility      string
+	LatestRepliedOn int64
+	Ip              string
+	Status          string
+	CreatedAt       int64
+	UpdatedAt       int64
+	AuthorNickname  string
+	AuthorAvatarUrl string
+}
+
+func (q *Queries) ListPublicPosts(ctx context.Context, arg ListPublicPostsParams) ([]ListPublicPostsRow, error) {
 	rows, err := q.db.QueryContext(ctx, listPublicPosts,
 		arg.Author,
 		arg.Visibility,
@@ -834,9 +988,9 @@ func (q *Queries) ListPublicPosts(ctx context.Context, arg ListPublicPostsParams
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Post
+	var items []ListPublicPostsRow
 	for rows.Next() {
-		var i Post
+		var i ListPublicPostsRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Uid,
@@ -854,6 +1008,8 @@ func (q *Queries) ListPublicPosts(ctx context.Context, arg ListPublicPostsParams
 			&i.Status,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.AuthorNickname,
+			&i.AuthorAvatarUrl,
 		); err != nil {
 			return nil, err
 		}

@@ -121,15 +121,15 @@
         ]
       }
     },
-    "/api/v1/files/meta/{url}": {
+    "/api/v1/files/content/{url}": {
       "get": {
-        "summary": "GET /api/v1/files/meta/{url} 获取文件元数据（不含内容）",
-        "operationId": "FileService_GetFileMeta",
+        "summary": "GET /api/v1/files/content/{url} 获取文件内容",
+        "operationId": "FileService_GetFile",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/fileGetFileMetaResponse"
+              "$ref": "#/definitions/apiHttpBody"
             }
           },
           "default": {
@@ -153,15 +153,15 @@
         ]
       }
     },
-    "/api/v1/files/{url}": {
+    "/api/v1/files/meta/{url}": {
       "get": {
-        "summary": "GET /api/v1/files/{url} 获取文件内容",
-        "operationId": "FileService_GetFile",
+        "summary": "GET /api/v1/files/meta/{url} 获取文件元数据（不含内容）",
+        "operationId": "FileService_GetFileMeta",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/apiHttpBody"
+              "$ref": "#/definitions/fileGetFileMetaResponse"
             }
           },
           "default": {

@@ -627,7 +627,8 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/postPostCounterResponse"
+              "type": "object",
+              "properties": {}
             }
           },
           "default": {
@@ -666,7 +667,8 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/postPostCounterResponse"
+              "type": "object",
+              "properties": {}
             }
           },
           "default": {
@@ -1057,6 +1059,39 @@
         "url"
       ]
     },
+    "postAttachment": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string",
+          "readOnly": true
+        },
+        "name": {
+          "type": "string",
+          "readOnly": true
+        },
+        "size": {
+          "type": "string",
+          "format": "int64",
+          "readOnly": true
+        },
+        "contentType": {
+          "type": "string",
+          "readOnly": true
+        },
+        "checksum": {
+          "type": "string",
+          "readOnly": true
+        }
+      },
+      "required": [
+        "url",
+        "name",
+        "size",
+        "contentType",
+        "checksum"
+      ]
+    },
     "postCreatePostRequest": {
       "type": "object",
       "properties": {
@@ -1092,13 +1127,13 @@
     "postCreatePostResponse": {
       "type": "object",
       "properties": {
-        "post": {
-          "$ref": "#/definitions/postPost",
+        "uid": {
+          "type": "string",
           "readOnly": true
         }
       },
       "required": [
-        "post"
+        "uid"
       ]
     },
     "postGetPostResponse": {
@@ -1165,7 +1200,8 @@
         "attachments": {
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "object",
+            "$ref": "#/definitions/postAttachment"
           },
           "readOnly": true
         },
@@ -1259,18 +1295,6 @@
         "avatarUrl"
       ]
     },
-    "postPostCounterResponse": {
-      "type": "object",
-      "properties": {
-        "post": {
-          "$ref": "#/definitions/postPost",
-          "readOnly": true
-        }
-      },
-      "required": [
-        "post"
-      ]
-    },
     "postToggleAction": {
       "type": "string",
       "enum": [
@@ -1283,13 +1307,13 @@
     "postUpdatePostResponse": {
       "type": "object",
       "properties": {
-        "post": {
-          "$ref": "#/definitions/postPost",
+        "uid": {
+          "type": "string",
           "readOnly": true
         }
       },
       "required": [
-        "post"
+        "uid"
       ]
     },
     "protobufAny": {

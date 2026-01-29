@@ -55,9 +55,9 @@ type PostServiceClient interface {
 	// DELETE /api/v1/posts/{uid} 软删
 	DeletePost(ctx context.Context, in *DeletePostRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// POST /api/v1/posts/{uid}/like 点赞或取消赞
-	LikePost(ctx context.Context, in *LikePostRequest, opts ...grpc.CallOption) (*PostCounterResponse, error)
+	LikePost(ctx context.Context, in *LikePostRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// POST /api/v1/posts/{uid}/collect 收藏或取消收藏
-	CollectPost(ctx context.Context, in *CollectPostRequest, opts ...grpc.CallOption) (*PostCounterResponse, error)
+	CollectPost(ctx context.Context, in *CollectPostRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type postServiceClient struct {
@@ -148,9 +148,9 @@ func (c *postServiceClient) DeletePost(ctx context.Context, in *DeletePostReques
 	return out, nil
 }
 
-func (c *postServiceClient) LikePost(ctx context.Context, in *LikePostRequest, opts ...grpc.CallOption) (*PostCounterResponse, error) {
+func (c *postServiceClient) LikePost(ctx context.Context, in *LikePostRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(PostCounterResponse)
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, PostService_LikePost_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -158,9 +158,9 @@ func (c *postServiceClient) LikePost(ctx context.Context, in *LikePostRequest, o
 	return out, nil
 }
 
-func (c *postServiceClient) CollectPost(ctx context.Context, in *CollectPostRequest, opts ...grpc.CallOption) (*PostCounterResponse, error) {
+func (c *postServiceClient) CollectPost(ctx context.Context, in *CollectPostRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(PostCounterResponse)
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, PostService_CollectPost_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -191,9 +191,9 @@ type PostServiceServer interface {
 	// DELETE /api/v1/posts/{uid} 软删
 	DeletePost(context.Context, *DeletePostRequest) (*emptypb.Empty, error)
 	// POST /api/v1/posts/{uid}/like 点赞或取消赞
-	LikePost(context.Context, *LikePostRequest) (*PostCounterResponse, error)
+	LikePost(context.Context, *LikePostRequest) (*emptypb.Empty, error)
 	// POST /api/v1/posts/{uid}/collect 收藏或取消收藏
-	CollectPost(context.Context, *CollectPostRequest) (*PostCounterResponse, error)
+	CollectPost(context.Context, *CollectPostRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedPostServiceServer()
 }
 
@@ -228,10 +228,10 @@ func (UnimplementedPostServiceServer) UpdatePost(context.Context, *UpdatePostReq
 func (UnimplementedPostServiceServer) DeletePost(context.Context, *DeletePostRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeletePost not implemented")
 }
-func (UnimplementedPostServiceServer) LikePost(context.Context, *LikePostRequest) (*PostCounterResponse, error) {
+func (UnimplementedPostServiceServer) LikePost(context.Context, *LikePostRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method LikePost not implemented")
 }
-func (UnimplementedPostServiceServer) CollectPost(context.Context, *CollectPostRequest) (*PostCounterResponse, error) {
+func (UnimplementedPostServiceServer) CollectPost(context.Context, *CollectPostRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method CollectPost not implemented")
 }
 func (UnimplementedPostServiceServer) mustEmbedUnimplementedPostServiceServer() {}

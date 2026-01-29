@@ -1074,40 +1074,40 @@ var File_user_proto protoreflect.FileDescriptor
 const file_user_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"user.proto\x12\x04user\x1a\x1cgoogle/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto\"\x99\x01\n" +
-	"\x04User\x12\x10\n" +
-	"\x03uid\x18\x01 \x01(\tR\x03uid\x12\x1a\n" +
-	"\busername\x18\x02 \x01(\tR\busername\x12\x12\n" +
-	"\x04role\x18\x03 \x01(\tR\x04role\x12\x14\n" +
-	"\x05email\x18\x04 \x01(\tR\x05email\x12\x1a\n" +
-	"\bnickname\x18\x05 \x01(\tR\bnickname\x12\x1d\n" +
+	"user.proto\x12\x04user\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\"\xc9\x01\n" +
+	"\x04User\x12\x18\n" +
+	"\x03uid\x18\x01 \x01(\tB\x06\xe0A\x03\xe0A\x02R\x03uid\x12\"\n" +
+	"\busername\x18\x02 \x01(\tB\x06\xe0A\x03\xe0A\x02R\busername\x12\x1a\n" +
+	"\x04role\x18\x03 \x01(\tB\x06\xe0A\x03\xe0A\x02R\x04role\x12\x1c\n" +
+	"\x05email\x18\x04 \x01(\tB\x06\xe0A\x03\xe0A\x02R\x05email\x12\"\n" +
+	"\bnickname\x18\x05 \x01(\tB\x06\xe0A\x03\xe0A\x02R\bnickname\x12%\n" +
 	"\n" +
-	"avatar_url\x18\x06 \x01(\tR\tavatarUrl\"}\n" +
+	"avatar_url\x18\x06 \x01(\tB\x06\xe0A\x03\xe0A\x02R\tavatarUrl\"}\n" +
 	"\x11CreateUserRequest\x12\x1a\n" +
 	"\busername\x18\x01 \x01(\tR\busername\x12\x1a\n" +
 	"\bpassword\x18\x02 \x01(\tR\bpassword\x12\x14\n" +
 	"\x05email\x18\x03 \x01(\tR\x05email\x12\x1a\n" +
-	"\bnickname\x18\x04 \x01(\tR\bnickname\"4\n" +
-	"\x12CreateUserResponse\x12\x1e\n" +
+	"\bnickname\x18\x04 \x01(\tR\bnickname\"<\n" +
+	"\x12CreateUserResponse\x12&\n" +
 	"\x04user\x18\x01 \x01(\v2\n" +
-	".user.UserR\x04user\"\x81\x01\n" +
+	".user.UserB\x06\xe0A\x03\xe0A\x02R\x04user\"\x81\x01\n" +
 	"\x10ListUsersRequest\x12\x1b\n" +
 	"\tpage_size\x18\x01 \x01(\x05R\bpageSize\x12\x1d\n" +
 	"\n" +
 	"page_token\x18\x02 \x01(\tR\tpageToken\x12\x16\n" +
 	"\x06filter\x18\x03 \x01(\tR\x06filter\x12\x19\n" +
-	"\border_by\x18\x04 \x01(\tR\aorderBy\"|\n" +
-	"\x11ListUsersResponse\x12 \n" +
+	"\border_by\x18\x04 \x01(\tR\aorderBy\"\x94\x01\n" +
+	"\x11ListUsersResponse\x12(\n" +
 	"\x05users\x18\x01 \x03(\v2\n" +
-	".user.UserR\x05users\x12&\n" +
-	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\x12\x1d\n" +
+	".user.UserB\x06\xe0A\x03\xe0A\x02R\x05users\x12.\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\tB\x06\xe0A\x03\xe0A\x02R\rnextPageToken\x12%\n" +
 	"\n" +
-	"total_size\x18\x03 \x01(\x03R\ttotalSize\"\"\n" +
+	"total_size\x18\x03 \x01(\x03B\x06\xe0A\x03\xe0A\x02R\ttotalSize\"\"\n" +
 	"\x0eGetUserRequest\x12\x10\n" +
-	"\x03uid\x18\x01 \x01(\tR\x03uid\"1\n" +
-	"\x0fGetUserResponse\x12\x1e\n" +
+	"\x03uid\x18\x01 \x01(\tR\x03uid\"9\n" +
+	"\x0fGetUserResponse\x12&\n" +
 	"\x04user\x18\x01 \x01(\v2\n" +
-	".user.UserR\x04user\"\xd9\x01\n" +
+	".user.UserB\x06\xe0A\x03\xe0A\x02R\x04user\"\xd9\x01\n" +
 	"\x11UpdateUserRequest\x12\x10\n" +
 	"\x03uid\x18\x01 \x01(\tR\x03uid\x12\x1f\n" +
 	"\busername\x18\x02 \x01(\tH\x00R\busername\x88\x01\x01\x12\x19\n" +
@@ -1118,15 +1118,15 @@ const file_user_proto_rawDesc = "" +
 	"\t_usernameB\b\n" +
 	"\x06_emailB\v\n" +
 	"\t_nicknameB\r\n" +
-	"\v_avatar_url\"4\n" +
-	"\x12UpdateUserResponse\x12\x1e\n" +
+	"\v_avatar_url\"<\n" +
+	"\x12UpdateUserResponse\x12&\n" +
 	"\x04user\x18\x01 \x01(\v2\n" +
-	".user.UserR\x04user\"%\n" +
+	".user.UserB\x06\xe0A\x03\xe0A\x02R\x04user\"%\n" +
 	"\x11DeleteUserRequest\x12\x10\n" +
-	"\x03uid\x18\x01 \x01(\tR\x03uid\"/\n" +
-	"\rGetMeResponse\x12\x1e\n" +
+	"\x03uid\x18\x01 \x01(\tR\x03uid\"7\n" +
+	"\rGetMeResponse\x12&\n" +
 	"\x04user\x18\x01 \x01(\v2\n" +
-	".user.UserR\x04user\"\xc5\x01\n" +
+	".user.UserB\x06\xe0A\x03\xe0A\x02R\x04user\"\xc5\x01\n" +
 	"\x0fUpdateMeRequest\x12\x1f\n" +
 	"\busername\x18\x01 \x01(\tH\x00R\busername\x88\x01\x01\x12\x19\n" +
 	"\x05email\x18\x02 \x01(\tH\x01R\x05email\x88\x01\x01\x12\x1f\n" +
@@ -1136,26 +1136,26 @@ const file_user_proto_rawDesc = "" +
 	"\t_usernameB\b\n" +
 	"\x06_emailB\v\n" +
 	"\t_nicknameB\r\n" +
-	"\v_avatar_url\"2\n" +
-	"\x10UpdateMeResponse\x12\x1e\n" +
+	"\v_avatar_url\":\n" +
+	"\x10UpdateMeResponse\x12&\n" +
 	"\x04user\x18\x01 \x01(\v2\n" +
-	".user.UserR\x04user\"{\n" +
+	".user.UserB\x06\xe0A\x03\xe0A\x02R\x04user\"{\n" +
 	"\fLoginRequest\x12\x18\n" +
 	"\aaccount\x18\x01 \x01(\tR\aaccount\x12\x1a\n" +
 	"\bpassword\x18\x02 \x01(\tR\bpassword\x12\x18\n" +
 	"\acaptcha\x18\x03 \x01(\tR\acaptcha\x12\x1b\n" +
-	"\tdevice_id\x18\x04 \x01(\tR\bdeviceId\"X\n" +
-	"\rLoginResponse\x12'\n" +
-	"\x06tokens\x18\x01 \x01(\v2\x0f.user.TokenPairR\x06tokens\x12\x1e\n" +
+	"\tdevice_id\x18\x04 \x01(\tR\bdeviceId\"h\n" +
+	"\rLoginResponse\x12/\n" +
+	"\x06tokens\x18\x01 \x01(\v2\x0f.user.TokenPairB\x06\xe0A\x03\xe0A\x02R\x06tokens\x12&\n" +
 	"\x04user\x18\x02 \x01(\v2\n" +
-	".user.UserR\x04user\":\n" +
+	".user.UserB\x06\xe0A\x03\xe0A\x02R\x04user\":\n" +
 	"\x13RefreshTokenRequest\x12#\n" +
-	"\rrefresh_token\x18\x01 \x01(\tR\frefreshToken\"?\n" +
-	"\x14RefreshTokenResponse\x12'\n" +
-	"\x06tokens\x18\x01 \x01(\v2\x0f.user.TokenPairR\x06tokens\"S\n" +
-	"\tTokenPair\x12!\n" +
-	"\faccess_token\x18\x01 \x01(\tR\vaccessToken\x12#\n" +
-	"\rrefresh_token\x18\x02 \x01(\tR\frefreshToken\"]\n" +
+	"\rrefresh_token\x18\x01 \x01(\tR\frefreshToken\"G\n" +
+	"\x14RefreshTokenResponse\x12/\n" +
+	"\x06tokens\x18\x01 \x01(\v2\x0f.user.TokenPairB\x06\xe0A\x03\xe0A\x02R\x06tokens\"c\n" +
+	"\tTokenPair\x12)\n" +
+	"\faccess_token\x18\x01 \x01(\tB\x06\xe0A\x03\xe0A\x02R\vaccessToken\x12+\n" +
+	"\rrefresh_token\x18\x02 \x01(\tB\x06\xe0A\x03\xe0A\x02R\frefreshToken\"]\n" +
 	"\x15ChangePasswordRequest\x12!\n" +
 	"\fold_password\x18\x01 \x01(\tR\voldPassword\x12!\n" +
 	"\fnew_password\x18\x02 \x01(\tR\vnewPassword2\x8b\a\n" +

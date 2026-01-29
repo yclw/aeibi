@@ -5,6 +5,7 @@ package user;
 option go_package = "aeibi/api;api";
 
 import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
 
 // UserService
@@ -89,12 +90,12 @@ service UserService {
 // -------------------- Messages --------------------
 
 message User {
-  string uid        = 1;
-  string username   = 2;
-  string role       = 3;
-  string email      = 4;
-  string nickname   = 5;
-  string avatar_url = 6;
+  string uid        = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  string username   = 2 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  string role       = 3 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  string email      = 4 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  string nickname   = 5 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  string avatar_url = 6 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
 }
 
 // Create
@@ -107,7 +108,7 @@ message CreateUserRequest {
 }
 
 message CreateUserResponse {
-  User user = 1;
+  User user = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
 }
 
 // List
@@ -120,9 +121,9 @@ message ListUsersRequest {
 }
 
 message ListUsersResponse {
-  repeated User users           = 1;
-  string        next_page_token = 2;
-  int64         total_size      = 3;
+  repeated User users           = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  string        next_page_token = 2 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  int64         total_size      = 3 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
 }
 
 // Get
@@ -132,7 +133,7 @@ message GetUserRequest {
 }
 
 message GetUserResponse {
-  User user = 1;
+  User user = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
 }
 
 // Update
@@ -146,7 +147,7 @@ message UpdateUserRequest {
 }
 
 message UpdateUserResponse {
-  User user = 1;
+  User user = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
 }
 
 // Delete
@@ -158,7 +159,7 @@ message DeleteUserRequest {
 // Me
 
 message GetMeResponse {
-  User user = 1;
+  User user = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
 }
 
 message UpdateMeRequest {
@@ -169,7 +170,7 @@ message UpdateMeRequest {
 }
 
 message UpdateMeResponse {
-  User user = 1;
+  User user = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
 }
 
 // Auth
@@ -182,8 +183,8 @@ message LoginRequest {
 }
 
 message LoginResponse {
-  TokenPair tokens = 1;
-  User      user   = 2;
+  TokenPair tokens = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  User      user   = 2 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
 }
 
 message RefreshTokenRequest {
@@ -191,13 +192,13 @@ message RefreshTokenRequest {
 }
 
 message RefreshTokenResponse {
-  TokenPair tokens = 1;
+  TokenPair tokens = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
 }
 
 // Tokens
 message TokenPair {
-  string access_token  = 1;
-  string refresh_token = 2;
+  string access_token  = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  string refresh_token = 2 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
 }
 
 // Password

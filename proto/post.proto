@@ -5,6 +5,7 @@ package post;
 option go_package = "aeibi/api;api";
 
 import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
 
 // PostService
@@ -87,21 +88,21 @@ service PostService {
 // -------------------- Messages --------------------
 
 message Post {
-  string          uid               = 1;
-  string          author            = 2;
-  string          text              = 3;
-  repeated string images            = 4;
-  repeated string attachments       = 5;
-  repeated string tags              = 6;
-  int64           comment_count     = 7;
-  int64           collection_count  = 8;
-  int64           like_count        = 9;
-  string          visibility        = 10;
-  int64           latest_replied_on = 11;
-  string          ip                = 12;
-  bool            pinned            = 13;
-  int64           created_at        = 14;
-  int64           updated_at        = 15;
+  string          uid               = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  string          author            = 2 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  string          text              = 3 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  repeated string images            = 4 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  repeated string attachments       = 5 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  repeated string tags              = 6 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  int64           comment_count     = 7 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  int64           collection_count  = 8 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  int64           like_count        = 9 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  string          visibility        = 10 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  int64           latest_replied_on = 11 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  string          ip                = 12 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  bool            pinned            = 13 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  int64           created_at        = 14 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  int64           updated_at        = 15 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
 }
 
 enum ToggleAction {
@@ -122,7 +123,7 @@ message CreatePostRequest {
 }
 
 message CreatePostResponse {
-  Post post = 1;
+  Post post = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
 }
 
 // List
@@ -137,9 +138,9 @@ message ListPostsRequest {
 }
 
 message ListPostsResponse {
-  repeated Post posts           = 1;
-  string        next_page_token = 2;
-  int64         total_size      = 3;
+  repeated Post posts           = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  string        next_page_token = 2 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  int64         total_size      = 3 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
 }
 
 // Get
@@ -149,7 +150,7 @@ message GetPostRequest {
 }
 
 message GetPostResponse {
-  Post post = 1;
+  Post post = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
 }
 
 // Update
@@ -165,7 +166,7 @@ message UpdatePostRequest {
 }
 
 message UpdatePostResponse {
-  Post post = 1;
+  Post post = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
 }
 
 // Delete
@@ -187,5 +188,5 @@ message CollectPostRequest {
 }
 
 message PostCounterResponse {
-  Post post = 1;
+  Post post = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
 }

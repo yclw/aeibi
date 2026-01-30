@@ -11,7 +11,7 @@ import "google/protobuf/empty.proto";
 // UserService
 service UserService {
   // POST /api/v1/users 创建用户
-  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {
+  rpc CreateUser(CreateUserRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/api/v1/users"
       body: "*"
@@ -55,7 +55,7 @@ service UserService {
   }
 
   // PATCH /api/v1/me 更新自己
-  rpc UpdateMe(UpdateMeRequest) returns (UpdateMeResponse) {
+  rpc UpdateMe(UpdateMeRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       patch: "/api/v1/me"
       body : "*"
@@ -105,10 +105,6 @@ message CreateUserRequest {
   string password = 2;
   string email    = 3;
   string nickname = 4;
-}
-
-message CreateUserResponse {
-  User user = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
 }
 
 // List
@@ -169,10 +165,6 @@ message UpdateMeRequest {
   optional string avatar_url = 4;
 }
 
-message UpdateMeResponse {
-  User user = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
-}
-
 // Auth
 
 message LoginRequest {
@@ -184,7 +176,6 @@ message LoginRequest {
 
 message LoginResponse {
   TokenPair tokens = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
-  User      user   = 2 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
 }
 
 message RefreshTokenRequest {

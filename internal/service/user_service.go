@@ -10,7 +10,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"path"
 	"strconv"
 	"time"
 
@@ -34,8 +33,7 @@ func NewUserService(dbx *sql.DB, ossClient *oss.OSS, cfg *config.Config) *UserSe
 	}
 }
 
-func (s *UserService) CreateUser(ctx context.Context, req *api.CreateUserRequest) (*api.CreateUserResponse, error) {
-	var resp *api.CreateUserResponse
+func (s *UserService) CreateUser(ctx context.Context, req *api.CreateUserRequest) error {
 	if err := db.WithTx(ctx, s.dbx, s.db, func(qtx *db.Queries) error {
 		uid := uuid.NewString()
 
@@ -48,7 +46,7 @@ func (s *UserService) CreateUser(ctx context.Context, req *api.CreateUserRequest
 		if err != nil {
 			return fmt.Errorf("hash password: %w", err)
 		}
-		row, err := qtx.CreateUser(ctx, db.CreateUserParams{
+		_, err = qtx.CreateUser(ctx, db.CreateUserParams{
 			Uid:          uid,
 			Username:     req.Username,
 			Email:        req.Email,
@@ -62,32 +60,11 @@ func (s *UserService) CreateUser(ctx context.Context, req *api.CreateUserRequest
 		if avatarKey, err = s.oss.PutObject(ctx, avatarKey, avatar, "image/png"); err != nil {
 			return fmt.Errorf("upload avatar: %w", err)
 		}
-
-		avatarRow, err := qtx.CreateFile(ctx, db.CreateFileParams{
-			Url:         avatarKey,
-			Name:        path.Base(avatarKey),
-			ContentType: "image/png",
-			Size:        int64(len(avatar)),
-			Checksum:    util.SHA256(avatar),
-			Uploader:    row.Uid,
-		})
-		if err != nil {
-			return fmt.Errorf("save file: %w", err)
-		}
-		resp = &api.CreateUserResponse{
-			User: &api.User{
-				Uid:       row.Uid,
-				Username:  row.Username,
-				Email:     row.Email,
-				Nickname:  row.Nickname,
-				AvatarUrl: avatarRow.Url,
-			},
-		}
 		return nil
 	}); err != nil {
-		return nil, err
+		return err
 	}
-	return resp, nil
+	return nil
 }
 
 func (s *UserService) ListUsers(ctx context.Context, req *api.ListUsersRequest) (*api.ListUsersResponse, error) {
@@ -238,7 +215,7 @@ func (s *UserService) GetMe(ctx context.Context, uid string) (*api.GetMeResponse
 	}, nil
 }
 
-func (s *UserService) UpdateMe(ctx context.Context, uid string, req *api.UpdateMeRequest) (*api.UpdateMeResponse, error) {
+func (s *UserService) UpdateMe(ctx context.Context, uid string, req *api.UpdateMeRequest) error {
 	params := db.UpdateUserByUidParams{Uid: uid}
 
 	if req.Username != nil {
@@ -254,24 +231,15 @@ func (s *UserService) UpdateMe(ctx context.Context, uid string, req *api.UpdateM
 		params.AvatarUrl = s.nsPtr(req.AvatarUrl)
 	}
 
-	row, err := s.db.UpdateUserByUid(ctx, params)
+	_, err := s.db.UpdateUserByUid(ctx, params)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, fmt.Errorf("user not found")
+			return fmt.Errorf("user not found")
 		}
-		return nil, fmt.Errorf("update user: %w", err)
+		return fmt.Errorf("update user: %w", err)
 	}
 
-	return &api.UpdateMeResponse{
-		User: &api.User{
-			Uid:       row.Uid,
-			Username:  row.Username,
-			Role:      row.Role,
-			Email:     row.Email,
-			Nickname:  row.Nickname,
-			AvatarUrl: row.AvatarUrl,
-		},
-	}, nil
+	return nil
 }
 
 func (s *UserService) Login(ctx context.Context, req *api.LoginRequest) (*api.LoginResponse, error) {
@@ -306,14 +274,6 @@ func (s *UserService) Login(ctx context.Context, req *api.LoginRequest) (*api.Lo
 			Tokens: &api.TokenPair{
 				AccessToken:  accessToken,
 				RefreshToken: refreshToken,
-			},
-			User: &api.User{
-				Uid:       row.Uid,
-				Username:  row.Username,
-				Role:      row.Role,
-				Email:     row.Email,
-				Nickname:  row.Nickname,
-				AvatarUrl: row.AvatarUrl,
 			},
 		}
 		return nil

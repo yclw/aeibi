@@ -51,7 +51,7 @@ type PostServiceClient interface {
 	// GET /api/v1/me/posts/{uid} 当前用户的帖子详情（含 PRIVATE）
 	GetMyPost(ctx context.Context, in *GetPostRequest, opts ...grpc.CallOption) (*GetPostResponse, error)
 	// PATCH /api/v1/posts/{uid} 更新正文/媒体/标签/可见性
-	UpdatePost(ctx context.Context, in *UpdatePostRequest, opts ...grpc.CallOption) (*UpdatePostResponse, error)
+	UpdatePost(ctx context.Context, in *UpdatePostRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// DELETE /api/v1/posts/{uid} 软删
 	DeletePost(ctx context.Context, in *DeletePostRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// POST /api/v1/posts/{uid}/like 点赞或取消赞
@@ -128,9 +128,9 @@ func (c *postServiceClient) GetMyPost(ctx context.Context, in *GetPostRequest, o
 	return out, nil
 }
 
-func (c *postServiceClient) UpdatePost(ctx context.Context, in *UpdatePostRequest, opts ...grpc.CallOption) (*UpdatePostResponse, error) {
+func (c *postServiceClient) UpdatePost(ctx context.Context, in *UpdatePostRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(UpdatePostResponse)
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, PostService_UpdatePost_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -187,7 +187,7 @@ type PostServiceServer interface {
 	// GET /api/v1/me/posts/{uid} 当前用户的帖子详情（含 PRIVATE）
 	GetMyPost(context.Context, *GetPostRequest) (*GetPostResponse, error)
 	// PATCH /api/v1/posts/{uid} 更新正文/媒体/标签/可见性
-	UpdatePost(context.Context, *UpdatePostRequest) (*UpdatePostResponse, error)
+	UpdatePost(context.Context, *UpdatePostRequest) (*emptypb.Empty, error)
 	// DELETE /api/v1/posts/{uid} 软删
 	DeletePost(context.Context, *DeletePostRequest) (*emptypb.Empty, error)
 	// POST /api/v1/posts/{uid}/like 点赞或取消赞
@@ -222,7 +222,7 @@ func (UnimplementedPostServiceServer) GetPost(context.Context, *GetPostRequest) 
 func (UnimplementedPostServiceServer) GetMyPost(context.Context, *GetPostRequest) (*GetPostResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetMyPost not implemented")
 }
-func (UnimplementedPostServiceServer) UpdatePost(context.Context, *UpdatePostRequest) (*UpdatePostResponse, error) {
+func (UnimplementedPostServiceServer) UpdatePost(context.Context, *UpdatePostRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdatePost not implemented")
 }
 func (UnimplementedPostServiceServer) DeletePost(context.Context, *DeletePostRequest) (*emptypb.Empty, error) {

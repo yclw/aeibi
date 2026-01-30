@@ -458,9 +458,7 @@ func (s *PostService) GetMyPost(ctx context.Context, uid string, req *api.GetPos
 	return &api.GetPostResponse{Post: post}, nil
 }
 
-func (s *PostService) UpdatePost(ctx context.Context, uid string, req *api.UpdatePostRequest) (*api.UpdatePostResponse, error) {
-	var updatedUID string
-
+func (s *PostService) UpdatePost(ctx context.Context, uid string, req *api.UpdatePostRequest) error {
 	if err := db.WithTx(ctx, s.dbx, s.db, func(qtx *db.Queries) error {
 		params := db.UpdatePostByUidAndAuthorParams{
 			Uid:    req.Uid,
@@ -498,7 +496,6 @@ func (s *PostService) UpdatePost(ctx context.Context, uid string, req *api.Updat
 			}
 			return fmt.Errorf("update post: %w", err)
 		}
-		updatedUID = updated.Uid
 
 		// Refresh tags if provided
 		if req.Tags != nil {
@@ -521,9 +518,9 @@ func (s *PostService) UpdatePost(ctx context.Context, uid string, req *api.Updat
 		}
 		return nil
 	}); err != nil {
-		return nil, err
+		return err
 	}
-	return &api.UpdatePostResponse{Uid: updatedUID}, nil
+	return nil
 }
 
 func (s *PostService) DeletePost(ctx context.Context, uid string, req *api.DeletePostRequest) error {

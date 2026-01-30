@@ -214,7 +214,8 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/userUpdateMeResponse"
+              "type": "object",
+              "properties": {}
             }
           },
           "default": {
@@ -588,7 +589,8 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/postUpdatePostResponse"
+              "type": "object",
+              "properties": {}
             }
           },
           "default": {
@@ -755,7 +757,8 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/userCreateUserResponse"
+              "type": "object",
+              "properties": {}
             }
           },
           "default": {
@@ -1304,18 +1307,6 @@
       ],
       "default": "TOGGLE_ACTION_UNSPECIFIED"
     },
-    "postUpdatePostResponse": {
-      "type": "object",
-      "properties": {
-        "uid": {
-          "type": "string",
-          "readOnly": true
-        }
-      },
-      "required": [
-        "uid"
-      ]
-    },
     "protobufAny": {
       "type": "object",
       "properties": {
@@ -1374,18 +1365,6 @@
           "type": "string"
         }
       }
-    },
-    "userCreateUserResponse": {
-      "type": "object",
-      "properties": {
-        "user": {
-          "$ref": "#/definitions/userUser",
-          "readOnly": true
-        }
-      },
-      "required": [
-        "user"
-      ]
     },
     "userGetMeResponse": {
       "type": "object",
@@ -1462,15 +1441,10 @@
         "tokens": {
           "$ref": "#/definitions/userTokenPair",
           "readOnly": true
-        },
-        "user": {
-          "$ref": "#/definitions/userUser",
-          "readOnly": true
         }
       },
       "required": [
-        "tokens",
-        "user"
+        "tokens"
       ]
     },
     "userRefreshTokenRequest": {
@@ -1527,18 +1501,6 @@
           "type": "string"
         }
       }
-    },
-    "userUpdateMeResponse": {
-      "type": "object",
-      "properties": {
-        "user": {
-          "$ref": "#/definitions/userUser",
-          "readOnly": true
-        }
-      },
-      "required": [
-        "user"
-      ]
     },
     "userUpdateUserResponse": {
       "type": "object",

@@ -54,7 +54,7 @@ service PostService {
   }
 
   // PATCH /api/v1/posts/{uid} 更新正文/媒体/标签/可见性
-  rpc UpdatePost(UpdatePostRequest) returns (UpdatePostResponse) {
+  rpc UpdatePost(UpdatePostRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       patch: "/api/v1/posts/{uid}"
       body : "*"
@@ -177,10 +177,6 @@ message UpdatePostRequest {
   repeated string tags        = 5;
   optional string visibility  = 6;
   optional bool   pinned      = 7;
-}
-
-message UpdatePostResponse {
-  string uid = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
 }
 
 // Delete

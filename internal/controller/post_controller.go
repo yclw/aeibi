@@ -87,7 +87,7 @@ func (h *PostHandler) GetPost(ctx context.Context, req *api.GetPostRequest) (*ap
 	return h.svc.GetPost(ctx, req)
 }
 
-func (h *PostHandler) UpdatePost(ctx context.Context, req *api.UpdatePostRequest) (*api.UpdatePostResponse, error) {
+func (h *PostHandler) UpdatePost(ctx context.Context, req *api.UpdatePostRequest) (*emptypb.Empty, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "request is nil")
 	}
@@ -101,7 +101,10 @@ func (h *PostHandler) UpdatePost(ctx context.Context, req *api.UpdatePostRequest
 	if !ok || uid == "" {
 		return nil, status.Error(codes.Unauthenticated, "unauthenticated")
 	}
-	return h.svc.UpdatePost(ctx, uid, req)
+	if err := h.svc.UpdatePost(ctx, uid, req); err != nil {
+		return nil, err
+	}
+	return &emptypb.Empty{}, nil
 }
 
 func (h *PostHandler) DeletePost(ctx context.Context, req *api.DeletePostRequest) (*emptypb.Empty, error) {
@@ -121,7 +124,7 @@ func (h *PostHandler) DeletePost(ctx context.Context, req *api.DeletePostRequest
 	return &emptypb.Empty{}, nil
 }
 
-func (h *PostHandler) LikePost(ctx context.Context, req *api.LikePostRequest) (*api.PostCounterResponse, error) {
+func (h *PostHandler) LikePost(ctx context.Context, req *api.LikePostRequest) (*emptypb.Empty, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "request is nil")
 	}
@@ -132,10 +135,13 @@ func (h *PostHandler) LikePost(ctx context.Context, req *api.LikePostRequest) (*
 	if !ok || uid == "" {
 		return nil, status.Error(codes.Unauthenticated, "unauthenticated")
 	}
-	return h.svc.LikePost(ctx, uid, req)
+	if err := h.svc.LikePost(ctx, uid, req); err != nil {
+		return nil, err
+	}
+	return &emptypb.Empty{}, nil
 }
 
-func (h *PostHandler) CollectPost(ctx context.Context, req *api.CollectPostRequest) (*api.PostCounterResponse, error) {
+func (h *PostHandler) CollectPost(ctx context.Context, req *api.CollectPostRequest) (*emptypb.Empty, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "request is nil")
 	}
@@ -146,5 +152,8 @@ func (h *PostHandler) CollectPost(ctx context.Context, req *api.CollectPostReque
 	if !ok || uid == "" {
 		return nil, status.Error(codes.Unauthenticated, "unauthenticated")
 	}
-	return h.svc.CollectPost(ctx, uid, req)
+	if err := h.svc.CollectPost(ctx, uid, req); err != nil {
+		return nil, err
+	}
+	return &emptypb.Empty{}, nil
 }

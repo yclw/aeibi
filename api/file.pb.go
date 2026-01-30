@@ -372,37 +372,37 @@ var File_file_proto protoreflect.FileDescriptor
 const file_file_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"file.proto\x12\x04file\x1a\x1cgoogle/api/annotations.proto\x1a\x19google/api/httpbody.proto\"\xa8\x01\n" +
-	"\x04File\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\x12!\n" +
-	"\fcontent_type\x18\x02 \x01(\tR\vcontentType\x12\x12\n" +
-	"\x04size\x18\x03 \x01(\x03R\x04size\x12\x1a\n" +
-	"\bchecksum\x18\x04 \x01(\tR\bchecksum\x12\x1a\n" +
-	"\buploader\x18\x05 \x01(\tR\buploader\x12\x1d\n" +
+	"file.proto\x12\x04file\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/httpbody.proto\"\xd8\x01\n" +
+	"\x04File\x12\x1a\n" +
+	"\x04name\x18\x01 \x01(\tB\x06\xe0A\x03\xe0A\x02R\x04name\x12)\n" +
+	"\fcontent_type\x18\x02 \x01(\tB\x06\xe0A\x03\xe0A\x02R\vcontentType\x12\x1a\n" +
+	"\x04size\x18\x03 \x01(\x03B\x06\xe0A\x03\xe0A\x02R\x04size\x12\"\n" +
+	"\bchecksum\x18\x04 \x01(\tB\x06\xe0A\x03\xe0A\x02R\bchecksum\x12\"\n" +
+	"\buploader\x18\x05 \x01(\tB\x06\xe0A\x03\xe0A\x02R\buploader\x12%\n" +
 	"\n" +
-	"created_at\x18\x06 \x01(\x03R\tcreatedAt\"z\n" +
+	"created_at\x18\x06 \x01(\x03B\x06\xe0A\x03\xe0A\x02R\tcreatedAt\"z\n" +
 	"\x11UploadFileRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12!\n" +
 	"\fcontent_type\x18\x02 \x01(\tR\vcontentType\x12\x12\n" +
 	"\x04data\x18\x03 \x01(\fR\x04data\x12\x1a\n" +
-	"\bchecksum\x18\x04 \x01(\tR\bchecksum\"F\n" +
-	"\x12UploadFileResponse\x12\x1e\n" +
+	"\bchecksum\x18\x04 \x01(\tR\bchecksum\"V\n" +
+	"\x12UploadFileResponse\x12&\n" +
 	"\x04file\x18\x01 \x01(\v2\n" +
-	".file.FileR\x04file\x12\x10\n" +
-	"\x03url\x18\x02 \x01(\tR\x03url\"&\n" +
+	".file.FileB\x06\xe0A\x03\xe0A\x02R\x04file\x12\x18\n" +
+	"\x03url\x18\x02 \x01(\tB\x06\xe0A\x03\xe0A\x02R\x03url\"&\n" +
 	"\x12GetFileMetaRequest\x12\x10\n" +
-	"\x03url\x18\x01 \x01(\tR\x03url\"G\n" +
-	"\x13GetFileMetaResponse\x12\x1e\n" +
+	"\x03url\x18\x01 \x01(\tR\x03url\"W\n" +
+	"\x13GetFileMetaResponse\x12&\n" +
 	"\x04file\x18\x01 \x01(\v2\n" +
-	".file.FileR\x04file\x12\x10\n" +
-	"\x03url\x18\x02 \x01(\tR\x03url\"\"\n" +
+	".file.FileB\x06\xe0A\x03\xe0A\x02R\x04file\x12\x18\n" +
+	"\x03url\x18\x02 \x01(\tB\x06\xe0A\x03\xe0A\x02R\x03url\"\"\n" +
 	"\x0eGetFileRequest\x12\x10\n" +
-	"\x03url\x18\x01 \x01(\tR\x03url2\xa8\x02\n" +
+	"\x03url\x18\x01 \x01(\tR\x03url2\xb0\x02\n" +
 	"\vFileService\x12Y\n" +
 	"\n" +
 	"UploadFile\x12\x17.file.UploadFileRequest\x1a\x18.file.UploadFileResponse\"\x18\x82\xd3\xe4\x93\x02\x12:\x01*\"\r/api/v1/files\x12g\n" +
-	"\vGetFileMeta\x12\x18.file.GetFileMetaRequest\x1a\x19.file.GetFileMetaResponse\"#\x82\xd3\xe4\x93\x02\x1d\x12\x1b/api/v1/files/meta/{url=**}\x12U\n" +
-	"\aGetFile\x12\x14.file.GetFileRequest\x1a\x14.google.api.HttpBody\"\x1e\x82\xd3\xe4\x93\x02\x18\x12\x16/api/v1/files/{url=**}B\x0fZ\raeibi/api;apib\x06proto3"
+	"\vGetFileMeta\x12\x18.file.GetFileMetaRequest\x1a\x19.file.GetFileMetaResponse\"#\x82\xd3\xe4\x93\x02\x1d\x12\x1b/api/v1/files/meta/{url=**}\x12]\n" +
+	"\aGetFile\x12\x14.file.GetFileRequest\x1a\x14.google.api.HttpBody\"&\x82\xd3\xe4\x93\x02 \x12\x1e/api/v1/files/content/{url=**}B\x0fZ\raeibi/api;apib\x06proto3"
 
 var (
 	file_file_proto_rawDescOnce sync.Once

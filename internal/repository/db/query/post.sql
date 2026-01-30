@@ -95,8 +95,11 @@ SELECT
   p.ip,
   p.status,
   p.created_at,
-  p.updated_at
+  p.updated_at,
+  COALESCE(u.nickname, '') AS author_nickname,
+  COALESCE(u.avatar_url, '') AS author_avatar_url
 FROM posts p
+LEFT JOIN users u ON u.uid = p.author
 WHERE p.status = 'NORMAL'
   AND p.visibility = 'PUBLIC'
   AND (
@@ -166,8 +169,11 @@ SELECT
   p.ip,
   p.status,
   p.created_at,
-  p.updated_at
+  p.updated_at,
+  COALESCE(u.nickname, '') AS author_nickname,
+  COALESCE(u.avatar_url, '') AS author_avatar_url
 FROM posts p
+LEFT JOIN users u ON u.uid = p.author
 WHERE p.status = 'NORMAL'
   AND p.author = sqlc.arg(author)
   AND (
@@ -194,73 +200,82 @@ OFFSET sqlc.arg(offset);
 
 -- name: GetPostByUid :one
 SELECT
-  id,
-  uid,
-  author,
-  text,
-  images,
-  attachments,
-  comment_count,
-  collection_count,
-  like_count,
-  pinned,
-  visibility,
-  latest_replied_on,
-  ip,
-  status,
-  created_at,
-  updated_at
-FROM posts
-WHERE uid = sqlc.arg(uid)
-  AND status = 'NORMAL'
+  p.id,
+  p.uid,
+  p.author,
+  p.text,
+  p.images,
+  p.attachments,
+  p.comment_count,
+  p.collection_count,
+  p.like_count,
+  p.pinned,
+  p.visibility,
+  p.latest_replied_on,
+  p.ip,
+  p.status,
+  p.created_at,
+  p.updated_at,
+  COALESCE(u.nickname, '') AS author_nickname,
+  COALESCE(u.avatar_url, '') AS author_avatar_url
+FROM posts p
+LEFT JOIN users u ON u.uid = p.author
+WHERE p.uid = sqlc.arg(uid)
+  AND p.status = 'NORMAL'
 LIMIT 1;
 
 -- name: GetPublicPostByUid :one
 SELECT
-  id,
-  uid,
-  author,
-  text,
-  images,
-  attachments,
-  comment_count,
-  collection_count,
-  like_count,
-  pinned,
-  visibility,
-  latest_replied_on,
-  ip,
-  status,
-  created_at,
-  updated_at
-FROM posts
-WHERE uid = sqlc.arg(uid)
-  AND visibility = 'PUBLIC'
-  AND status = 'NORMAL'
+  p.id,
+  p.uid,
+  p.author,
+  p.text,
+  p.images,
+  p.attachments,
+  p.comment_count,
+  p.collection_count,
+  p.like_count,
+  p.pinned,
+  p.visibility,
+  p.latest_replied_on,
+  p.ip,
+  p.status,
+  p.created_at,
+  p.updated_at,
+  COALESCE(u.nickname, '') AS author_nickname,
+  COALESCE(u.avatar_url, '') AS author_avatar_url
+FROM posts p
+LEFT JOIN users u ON u.uid = p.author
+WHERE p.uid = sqlc.arg(uid)
+  AND p.visibility = 'PUBLIC'
+  AND p.status = 'NORMAL'
 LIMIT 1;
 
 -- name: GetPostByUidAndAuthor :one
 SELECT
-  id,
-  uid,
-  author,
-  text,
-  images,
-  attachments,
-  comment_count,
-  collection_count,
-  like_count,
-  pinned,
-  visibility,
-  latest_replied_on,
-  ip,
-  status,
-  created_at,
-  updated_at
-FROM posts
-WHERE uid = sqlc.arg(uid)
-  AND author = sqlc.arg(author)
-  AND status = 'NORMAL'
+  p.id,
+  p.uid,
+  p.author,
+  p.text,
+  p.images,
+  p.attachments,
+  p.comment_count,
+  p.collection_count,
+  p.like_count,
+  p.pinned,
+  p.visibility,
+  p.latest_replied_on,
+  p.ip,
+  p.status,
+  p.created_at,
+  p.updated_at,
+  COALESCE(u.nickname, '') AS author_nickname,
+  COALESCE(u.avatar_url, '') AS author_avatar_url
+FROM posts p
+LEFT JOIN users u ON u.uid = p.author
+WHERE p.uid = sqlc.arg(uid)
+  AND p.author = sqlc.arg(author)
+  AND p.status = 'NORMAL'
 LIMIT 1;
 
 -- name: ListPostTagsByUid :many
@@ -318,9 +333,12 @@ SELECT
   p.ip,
   p.status,
   p.created_at,
-  p.updated_at
+  p.updated_at,
+  COALESCE(u.nickname, '') AS author_nickname,
+  COALESCE(u.avatar_url, '') AS author_avatar_url
 FROM post_collections pc
 JOIN posts p ON p.uid = pc.post_uid
+LEFT JOIN users u ON u.uid = p.author
 WHERE pc.user_uid = sqlc.arg(user_uid)
   AND p.status = 'NORMAL'
   AND (p.visibility = 'PUBLIC' OR p.author = sqlc.arg(user_uid))

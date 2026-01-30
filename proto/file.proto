@@ -5,6 +5,7 @@ package file;
 option go_package = "aeibi/api;api";
 
 import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
 import "google/api/httpbody.proto";
 
 // FileService
@@ -24,10 +25,10 @@ service FileService {
     };
   }
 
-  // GET /api/v1/files/{url} 获取文件内容
+  // GET /api/v1/files/content/{url} 获取文件内容
   rpc GetFile(GetFileRequest) returns (google.api.HttpBody) {
     option (google.api.http) = {
-      get: "/api/v1/files/{url=**}"
+      get: "/api/v1/files/content/{url=**}"
     };
   }
 }
@@ -35,12 +36,12 @@ service FileService {
 // -------------------- Messages --------------------
 
 message File {
-  string name         = 1;
-  string content_type = 2;
-  int64  size         = 3;
-  string checksum     = 4;
-  string uploader     = 5;
-  int64  created_at   = 6;
+  string name         = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  string content_type = 2 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  int64  size         = 3 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  string checksum     = 4 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  string uploader     = 5 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  int64  created_at   = 6 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
 }
 
 message UploadFileRequest {
@@ -51,8 +52,8 @@ message UploadFileRequest {
 }
 
 message UploadFileResponse {
-  File  file = 1;
-  string url  = 2;
+  File  file = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  string url  = 2 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
 }
 
 message GetFileMetaRequest {
@@ -60,8 +61,8 @@ message GetFileMetaRequest {
 }
 
 message GetFileMetaResponse {
-  File  file = 1;
-  string url  = 2;
+  File  file = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  string url  = 2 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
 }
 
 message GetFileRequest {

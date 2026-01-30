@@ -20,7 +20,7 @@ func NewUserHandler(svc *service.UserService) *UserHandler {
 	return &UserHandler{svc: svc}
 }
 
-func (h *UserHandler) CreateUser(ctx context.Context, req *api.CreateUserRequest) (*api.CreateUserResponse, error) {
+func (h *UserHandler) CreateUser(ctx context.Context, req *api.CreateUserRequest) (*emptypb.Empty, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "request is nil")
 	}
@@ -30,7 +30,10 @@ func (h *UserHandler) CreateUser(ctx context.Context, req *api.CreateUserRequest
 	if req.Password == "" {
 		return nil, status.Error(codes.InvalidArgument, "password is required")
 	}
-	return h.svc.CreateUser(ctx, req)
+	if err := h.svc.CreateUser(ctx, req); err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+	return &emptypb.Empty{}, nil
 }
 
 func (h *UserHandler) ListUsers(ctx context.Context, req *api.ListUsersRequest) (*api.ListUsersResponse, error) {
@@ -57,7 +60,7 @@ func (h *UserHandler) UpdateUser(ctx context.Context, req *api.UpdateUserRequest
 	if req.Uid == "" {
 		return nil, status.Error(codes.InvalidArgument, "uid is required")
 	}
-	if req.Username == nil || req.Email == nil || req.Nickname == nil || req.AvatarUrl == nil {
+	if req.Username == nil && req.Email == nil && req.Nickname == nil && req.AvatarUrl == nil {
 		return nil, status.Error(codes.InvalidArgument, "no fields to update")
 	}
 	return h.svc.UpdateUser(ctx, req)
@@ -87,11 +90,11 @@ func (h *UserHandler) GetMe(ctx context.Context, _ *emptypb.Empty) (*api.GetMeRe
 	return h.svc.GetMe(ctx, uid)
 }
 
-func (h *UserHandler) UpdateMe(ctx context.Context, req *api.UpdateMeRequest) (*api.UpdateMeResponse, error) {
+func (h *UserHandler) UpdateMe(ctx context.Context, req *api.UpdateMeRequest) (*emptypb.Empty, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "request is nil")
 	}
-	if req.Username == nil || req.Email == nil || req.Nickname == nil || req.AvatarUrl == nil {
+	if req.Username == nil && req.Email == nil && req.Nickname == nil && req.AvatarUrl == nil {
 		return nil, status.Error(codes.InvalidArgument, "no fields to update")
 	}
 	uid, ok := auth.SubjectFromContext(ctx)
@@ -101,7 +104,10 @@ func (h *UserHandler) UpdateMe(ctx context.Context, req *api.UpdateMeRequest) (*
 	if uid == "" {
 		return nil, status.Error(codes.Unauthenticated, "unauthenticated")
 	}
-	return h.svc.UpdateMe(ctx, uid, req)
+	if err := h.svc.UpdateMe(ctx, uid, req); err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+	return &emptypb.Empty{}, nil
 }
 
 func (h *UserHandler) Login(ctx context.Context, req *api.LoginRequest) (*api.LoginResponse, error) {

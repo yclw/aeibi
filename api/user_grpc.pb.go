@@ -39,7 +39,7 @@ const (
 // UserService
 type UserServiceClient interface {
 	// POST /api/v1/users 创建用户
-	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error)
+	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// GET /api/v1/users 列表
 	ListUsers(ctx context.Context, in *ListUsersRequest, opts ...grpc.CallOption) (*ListUsersResponse, error)
 	// GET /api/v1/users/{uid} 详情
@@ -51,7 +51,7 @@ type UserServiceClient interface {
 	// GET /api/v1/me 当前用户
 	GetMe(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetMeResponse, error)
 	// PATCH /api/v1/me 更新自己
-	UpdateMe(ctx context.Context, in *UpdateMeRequest, opts ...grpc.CallOption) (*UpdateMeResponse, error)
+	UpdateMe(ctx context.Context, in *UpdateMeRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// POST /api/v1/auth/login 登录
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 	// POST /api/v1/auth/refresh 刷新 token
@@ -68,9 +68,9 @@ func NewUserServiceClient(cc grpc.ClientConnInterface) UserServiceClient {
 	return &userServiceClient{cc}
 }
 
-func (c *userServiceClient) CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error) {
+func (c *userServiceClient) CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CreateUserResponse)
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, UserService_CreateUser_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -128,9 +128,9 @@ func (c *userServiceClient) GetMe(ctx context.Context, in *emptypb.Empty, opts .
 	return out, nil
 }
 
-func (c *userServiceClient) UpdateMe(ctx context.Context, in *UpdateMeRequest, opts ...grpc.CallOption) (*UpdateMeResponse, error) {
+func (c *userServiceClient) UpdateMe(ctx context.Context, in *UpdateMeRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(UpdateMeResponse)
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, UserService_UpdateMe_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -175,7 +175,7 @@ func (c *userServiceClient) ChangePassword(ctx context.Context, in *ChangePasswo
 // UserService
 type UserServiceServer interface {
 	// POST /api/v1/users 创建用户
-	CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error)
+	CreateUser(context.Context, *CreateUserRequest) (*emptypb.Empty, error)
 	// GET /api/v1/users 列表
 	ListUsers(context.Context, *ListUsersRequest) (*ListUsersResponse, error)
 	// GET /api/v1/users/{uid} 详情
@@ -187,7 +187,7 @@ type UserServiceServer interface {
 	// GET /api/v1/me 当前用户
 	GetMe(context.Context, *emptypb.Empty) (*GetMeResponse, error)
 	// PATCH /api/v1/me 更新自己
-	UpdateMe(context.Context, *UpdateMeRequest) (*UpdateMeResponse, error)
+	UpdateMe(context.Context, *UpdateMeRequest) (*emptypb.Empty, error)
 	// POST /api/v1/auth/login 登录
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
 	// POST /api/v1/auth/refresh 刷新 token
@@ -204,7 +204,7 @@ type UserServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedUserServiceServer struct{}
 
-func (UnimplementedUserServiceServer) CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error) {
+func (UnimplementedUserServiceServer) CreateUser(context.Context, *CreateUserRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method CreateUser not implemented")
 }
 func (UnimplementedUserServiceServer) ListUsers(context.Context, *ListUsersRequest) (*ListUsersResponse, error) {
@@ -222,7 +222,7 @@ func (UnimplementedUserServiceServer) DeleteUser(context.Context, *DeleteUserReq
 func (UnimplementedUserServiceServer) GetMe(context.Context, *emptypb.Empty) (*GetMeResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetMe not implemented")
 }
-func (UnimplementedUserServiceServer) UpdateMe(context.Context, *UpdateMeRequest) (*UpdateMeResponse, error) {
+func (UnimplementedUserServiceServer) UpdateMe(context.Context, *UpdateMeRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdateMe not implemented")
 }
 func (UnimplementedUserServiceServer) Login(context.Context, *LoginRequest) (*LoginResponse, error) {

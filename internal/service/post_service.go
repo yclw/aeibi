@@ -29,10 +29,8 @@ func NewPostService(dbx *sql.DB, ossClient *oss.OSS) *PostService {
 }
 
 func (s *PostService) CreatePost(ctx context.Context, uid string, req *api.CreatePostRequest) (*api.CreatePostResponse, error) {
-	var resp *api.CreatePostResponse
+	postUID := uuid.NewString()
 	if err := db.WithTx(ctx, s.dbx, s.db, func(qtx *db.Queries) error {
-		postUID := uuid.NewString()
-
 		images, err := util.EncodeStringSlice(req.Images)
 		if err != nil {
 			return fmt.Errorf("marshal images: %w", err)
@@ -71,41 +69,11 @@ func (s *PostService) CreatePost(ctx context.Context, uid string, req *api.Creat
 			}
 		}
 
-		tags, err := qtx.ListPostTagsByUid(ctx, postRow.Uid)
-		if err != nil {
-			return fmt.Errorf("list tags: %w", err)
-		}
-
-		post := &api.Post{
-			Uid:             postRow.Uid,
-			Author:          postRow.Author,
-			Text:            postRow.Text,
-			Tags:            tags,
-			CommentCount:    postRow.CommentCount,
-			CollectionCount: postRow.CollectionCount,
-			LikeCount:       postRow.LikeCount,
-			Visibility:      postRow.Visibility,
-			LatestRepliedOn: postRow.LatestRepliedOn,
-			Ip:              postRow.Ip,
-			Pinned:          postRow.Pinned == 1,
-			CreatedAt:       postRow.CreatedAt,
-			UpdatedAt:       postRow.UpdatedAt,
-		}
-		post.Images, err = util.DecodeStringSlice(postRow.Images)
-		if err != nil {
-			return fmt.Errorf("decode images: %w", err)
-		}
-		post.Attachments, err = util.DecodeStringSlice(postRow.Attachments)
-		if err != nil {
-			return fmt.Errorf("decode attachments: %w", err)
-		}
-		resp = &api.CreatePostResponse{Post: post}
 		return nil
 	}); err != nil {
 		return nil, err
 	}
-
-	return resp, nil
+	return &api.CreatePostResponse{Uid: postUID}, nil
 }
 
 func (s *PostService) ListPosts(ctx context.Context, req *api.ListPostsRequest) (*api.ListPostsResponse, error) {
@@ -158,7 +126,7 @@ func (s *PostService) ListPosts(ctx context.Context, req *api.ListPostsRequest) 
 
 		post := &api.Post{
 			Uid:             row.Uid,
-			Author:          row.Author,
+			Author:          s.postAuthor(row.Author, row.AuthorNickname, row.AuthorAvatarUrl),
 			Text:            row.Text,
 			CommentCount:    row.CommentCount,
 			CollectionCount: row.CollectionCount,
@@ -175,9 +143,16 @@ func (s *PostService) ListPosts(ctx context.Context, req *api.ListPostsRequest) 
 		if err != nil {
 			return nil, fmt.Errorf("decode images: %w", err)
 		}
-		post.Attachments, err = util.DecodeStringSlice(row.Attachments)
+		attachmentUrls, err := util.DecodeStringSlice(row.Attachments)
 		if err != nil {
 			return nil, fmt.Errorf("decode attachments: %w", err)
+		}
+		for _, url := range attachmentUrls {
+			fileMeta, err := s.getFileMeta(ctx, url)
+			if err != nil {
+				return nil, fmt.Errorf("get attachment meta: %w", err)
+			}
+			post.Attachments = append(post.Attachments, fileMeta)
 		}
 		posts = append(posts, post)
 	}
@@ -244,7 +219,7 @@ func (s *PostService) ListMyPosts(ctx context.Context, uid string, req *api.List
 
 		post := &api.Post{
 			Uid:             row.Uid,
-			Author:          row.Author,
+			Author:          s.postAuthor(row.Author, row.AuthorNickname, row.AuthorAvatarUrl),
 			Text:            row.Text,
 			CommentCount:    row.CommentCount,
 			CollectionCount: row.CollectionCount,
@@ -261,9 +236,16 @@ func (s *PostService) ListMyPosts(ctx context.Context, uid string, req *api.List
 		if err != nil {
 			return nil, fmt.Errorf("decode images: %w", err)
 		}
-		post.Attachments, err = util.DecodeStringSlice(row.Attachments)
+		attachmentUrls, err := util.DecodeStringSlice(row.Attachments)
 		if err != nil {
 			return nil, fmt.Errorf("decode attachments: %w", err)
+		}
+		for _, url := range attachmentUrls {
+			fileMeta, err := s.getFileMeta(ctx, url)
+			if err != nil {
+				return nil, fmt.Errorf("get attachment meta: %w", err)
+			}
+			post.Attachments = append(post.Attachments, fileMeta)
 		}
 		posts = append(posts, post)
 	}
@@ -332,7 +314,7 @@ func (s *PostService) ListMyCollections(ctx context.Context, uid string, req *ap
 
 		post := &api.Post{
 			Uid:             row.Uid,
-			Author:          row.Author,
+			Author:          s.postAuthor(row.Author, row.AuthorNickname, row.AuthorAvatarUrl),
 			Text:            row.Text,
 			CommentCount:    row.CommentCount,
 			CollectionCount: row.CollectionCount,
@@ -349,9 +331,16 @@ func (s *PostService) ListMyCollections(ctx context.Context, uid string, req *ap
 		if err != nil {
 			return nil, fmt.Errorf("decode images: %w", err)
 		}
-		post.Attachments, err = util.DecodeStringSlice(row.Attachments)
+		attachmentUrls, err := util.DecodeStringSlice(row.Attachments)
 		if err != nil {
 			return nil, fmt.Errorf("decode attachments: %w", err)
+		}
+		for _, url := range attachmentUrls {
+			fileMeta, err := s.getFileMeta(ctx, url)
+			if err != nil {
+				return nil, fmt.Errorf("get attachment meta: %w", err)
+			}
+			post.Attachments = append(post.Attachments, fileMeta)
 		}
 		posts = append(posts, post)
 	}
@@ -384,7 +373,7 @@ func (s *PostService) GetPost(ctx context.Context, req *api.GetPostRequest) (*ap
 
 	post := &api.Post{
 		Uid:             row.Uid,
-		Author:          row.Author,
+		Author:          s.postAuthor(row.Author, row.AuthorNickname, row.AuthorAvatarUrl),
 		Text:            row.Text,
 		CommentCount:    row.CommentCount,
 		CollectionCount: row.CollectionCount,
@@ -402,9 +391,16 @@ func (s *PostService) GetPost(ctx context.Context, req *api.GetPostRequest) (*ap
 	if err != nil {
 		return nil, fmt.Errorf("decode images: %w", err)
 	}
-	post.Attachments, err = util.DecodeStringSlice(row.Attachments)
+	attachmentUrls, err := util.DecodeStringSlice(row.Attachments)
 	if err != nil {
 		return nil, fmt.Errorf("decode attachments: %w", err)
+	}
+	for _, url := range attachmentUrls {
+		fileMeta, err := s.getFileMeta(ctx, url)
+		if err != nil {
+			return nil, fmt.Errorf("get attachment meta: %w", err)
+		}
+		post.Attachments = append(post.Attachments, fileMeta)
 	}
 
 	return &api.GetPostResponse{Post: post}, nil
@@ -429,7 +425,7 @@ func (s *PostService) GetMyPost(ctx context.Context, uid string, req *api.GetPos
 
 	post := &api.Post{
 		Uid:             row.Uid,
-		Author:          row.Author,
+		Author:          s.postAuthor(row.Author, row.AuthorNickname, row.AuthorAvatarUrl),
 		Text:            row.Text,
 		CommentCount:    row.CommentCount,
 		CollectionCount: row.CollectionCount,
@@ -447,17 +443,22 @@ func (s *PostService) GetMyPost(ctx context.Context, uid string, req *api.GetPos
 	if err != nil {
 		return nil, fmt.Errorf("decode images: %w", err)
 	}
-	post.Attachments, err = util.DecodeStringSlice(row.Attachments)
+	attachmentUrls, err := util.DecodeStringSlice(row.Attachments)
 	if err != nil {
 		return nil, fmt.Errorf("decode attachments: %w", err)
+	}
+	for _, url := range attachmentUrls {
+		fileMeta, err := s.getFileMeta(ctx, url)
+		if err != nil {
+			return nil, fmt.Errorf("get attachment meta: %w", err)
+		}
+		post.Attachments = append(post.Attachments, fileMeta)
 	}
 
 	return &api.GetPostResponse{Post: post}, nil
 }
 
-func (s *PostService) UpdatePost(ctx context.Context, uid string, req *api.UpdatePostRequest) (*api.UpdatePostResponse, error) {
-	var resp *api.UpdatePostResponse
-
+func (s *PostService) UpdatePost(ctx context.Context, uid string, req *api.UpdatePostRequest) error {
 	if err := db.WithTx(ctx, s.dbx, s.db, func(qtx *db.Queries) error {
 		params := db.UpdatePostByUidAndAuthorParams{
 			Uid:    req.Uid,
@@ -515,44 +516,11 @@ func (s *PostService) UpdatePost(ctx context.Context, uid string, req *api.Updat
 				}
 			}
 		}
-
-		tags, err := qtx.ListPostTagsByUid(ctx, req.Uid)
-		if err != nil {
-			return fmt.Errorf("list tags: %w", err)
-		}
-
-		post := &api.Post{
-			Uid:             updated.Uid,
-			Author:          updated.Author,
-			Text:            updated.Text,
-			CommentCount:    updated.CommentCount,
-			CollectionCount: updated.CollectionCount,
-			LikeCount:       updated.LikeCount,
-			Visibility:      updated.Visibility,
-			LatestRepliedOn: updated.LatestRepliedOn,
-			Ip:              updated.Ip,
-			Pinned:          updated.Pinned == 1,
-			CreatedAt:       updated.CreatedAt,
-			UpdatedAt:       updated.UpdatedAt,
-			Tags:            tags,
-		}
-
-		post.Images, err = util.DecodeStringSlice(updated.Images)
-		if err != nil {
-			return fmt.Errorf("decode images: %w", err)
-		}
-		post.Attachments, err = util.DecodeStringSlice(updated.Attachments)
-		if err != nil {
-			return fmt.Errorf("decode attachments: %w", err)
-		}
-
-		resp = &api.UpdatePostResponse{Post: post}
 		return nil
 	}); err != nil {
-		return nil, err
+		return err
 	}
-
-	return resp, nil
+	return nil
 }
 
 func (s *PostService) DeletePost(ctx context.Context, uid string, req *api.DeletePostRequest) error {
@@ -571,12 +539,9 @@ func (s *PostService) DeletePost(ctx context.Context, uid string, req *api.Delet
 	})
 }
 
-func (s *PostService) LikePost(ctx context.Context, uid string, req *api.LikePostRequest) (*api.PostCounterResponse, error) {
-	var resp *api.PostCounterResponse
-
+func (s *PostService) LikePost(ctx context.Context, uid string, req *api.LikePostRequest) error {
 	if err := db.WithTx(ctx, s.dbx, s.db, func(qtx *db.Queries) error {
-		postRow, err := qtx.GetPostByUid(ctx, req.Uid)
-		if err != nil {
+		if _, err := qtx.GetPostByUid(ctx, req.Uid); err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
 				return fmt.Errorf("post not found")
 			}
@@ -611,56 +576,19 @@ func (s *PostService) LikePost(ctx context.Context, uid string, req *api.LikePos
 			}); err != nil {
 				return fmt.Errorf("update like count: %w", err)
 			}
-			postRow.LikeCount += delta
-			if postRow.LikeCount < 0 {
-				postRow.LikeCount = 0
-			}
 		}
 
-		tags, err := qtx.ListPostTagsByUid(ctx, req.Uid)
-		if err != nil {
-			return fmt.Errorf("list tags: %w", err)
-		}
-
-		post := &api.Post{
-			Uid:             postRow.Uid,
-			Author:          postRow.Author,
-			Text:            postRow.Text,
-			CommentCount:    postRow.CommentCount,
-			CollectionCount: postRow.CollectionCount,
-			LikeCount:       postRow.LikeCount,
-			Visibility:      postRow.Visibility,
-			LatestRepliedOn: postRow.LatestRepliedOn,
-			Ip:              postRow.Ip,
-			Pinned:          postRow.Pinned == 1,
-			CreatedAt:       postRow.CreatedAt,
-			UpdatedAt:       postRow.UpdatedAt,
-			Tags:            tags,
-		}
-		post.Images, err = util.DecodeStringSlice(postRow.Images)
-		if err != nil {
-			return fmt.Errorf("decode images: %w", err)
-		}
-		post.Attachments, err = util.DecodeStringSlice(postRow.Attachments)
-		if err != nil {
-			return fmt.Errorf("decode attachments: %w", err)
-		}
-
-		resp = &api.PostCounterResponse{Post: post}
 		return nil
 	}); err != nil {
-		return nil, err
+		return err
 	}
 
-	return resp, nil
+	return nil
 }
 
-func (s *PostService) CollectPost(ctx context.Context, uid string, req *api.CollectPostRequest) (*api.PostCounterResponse, error) {
-	var resp *api.PostCounterResponse
-
+func (s *PostService) CollectPost(ctx context.Context, uid string, req *api.CollectPostRequest) error {
 	if err := db.WithTx(ctx, s.dbx, s.db, func(qtx *db.Queries) error {
-		postRow, err := qtx.GetPostByUid(ctx, req.Uid)
-		if err != nil {
+		if _, err := qtx.GetPostByUid(ctx, req.Uid); err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
 				return fmt.Errorf("post not found")
 			}
@@ -695,49 +623,22 @@ func (s *PostService) CollectPost(ctx context.Context, uid string, req *api.Coll
 			}); err != nil {
 				return fmt.Errorf("update collection count: %w", err)
 			}
-			postRow.CollectionCount += delta
-			if postRow.CollectionCount < 0 {
-				postRow.CollectionCount = 0
-			}
 		}
 
-		tags, err := qtx.ListPostTagsByUid(ctx, req.Uid)
-		if err != nil {
-			return fmt.Errorf("list tags: %w", err)
-		}
-
-		post := &api.Post{
-			Uid:             postRow.Uid,
-			Author:          postRow.Author,
-			Text:            postRow.Text,
-			CommentCount:    postRow.CommentCount,
-			CollectionCount: postRow.CollectionCount,
-			LikeCount:       postRow.LikeCount,
-			Visibility:      postRow.Visibility,
-			LatestRepliedOn: postRow.LatestRepliedOn,
-			Ip:              postRow.Ip,
-			Pinned:          postRow.Pinned == 1,
-			CreatedAt:       postRow.CreatedAt,
-			UpdatedAt:       postRow.UpdatedAt,
-			Tags:            tags,
-		}
-
-		post.Images, err = util.DecodeStringSlice(postRow.Images)
-		if err != nil {
-			return fmt.Errorf("decode images: %w", err)
-		}
-		post.Attachments, err = util.DecodeStringSlice(postRow.Attachments)
-		if err != nil {
-			return fmt.Errorf("decode attachments: %w", err)
-		}
-
-		resp = &api.PostCounterResponse{Post: post}
 		return nil
 	}); err != nil {
-		return nil, err
+		return err
 	}
 
-	return resp, nil
+	return nil
+}
+
+func (s *PostService) postAuthor(uid, nickname, avatarURL string) *api.PostAuthor {
+	return &api.PostAuthor{
+		Uid:       uid,
+		Nickname:  nickname,
+		AvatarUrl: avatarURL,
+	}
 }
 
 func (s *PostService) nsPtr(p *string) sql.NullString {
@@ -745,4 +646,22 @@ func (s *PostService) nsPtr(p *string) sql.NullString {
 		return sql.NullString{}
 	}
 	return sql.NullString{String: *p, Valid: true}
+}
+
+func (s *PostService) getFileMeta(ctx context.Context, url string) (*api.Attachment, error) {
+	row, err := s.db.GetFileByURL(ctx, url)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, fmt.Errorf("file not found")
+		}
+		return nil, fmt.Errorf("get file: %w", err)
+	}
+
+	return &api.Attachment{
+		Url:         row.Url,
+		Name:        row.Name,
+		ContentType: row.ContentType,
+		Size:        row.Size,
+		Checksum:    row.Checksum,
+	}, nil
 }

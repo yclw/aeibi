@@ -8,171 +8,69 @@ package db
 import (
 	"context"
 	"database/sql"
+	"time"
+
+	"github.com/google/uuid"
 )
 
-const archiveUserByUid = `-- name: ArchiveUserByUid :execrows
-UPDATE users
-SET
-  status = 'ARCHIVED',
-  updated_at = unixepoch()
-WHERE uid = ?1
-  AND status = 'NORMAL'
-`
-
-func (q *Queries) ArchiveUserByUid(ctx context.Context, uid string) (int64, error) {
-	result, err := q.db.ExecContext(ctx, archiveUserByUid, uid)
-	if err != nil {
-		return 0, err
-	}
-	return result.RowsAffected()
-}
-
-const countUsers = `-- name: CountUsers :one
-SELECT COUNT(1)
-FROM users
-WHERE status = 'NORMAL'
-  AND (
-    LENGTH(CAST(?1 AS TEXT)) = 0
-    OR username LIKE '%' || CAST(?1 AS TEXT) || '%'
-    OR email LIKE '%' || CAST(?1 AS TEXT) || '%'
-    OR nickname LIKE '%' || CAST(?1 AS TEXT) || '%'
-  )
-`
-
-func (q *Queries) CountUsers(ctx context.Context, filter string) (int64, error) {
-	row := q.db.QueryRowContext(ctx, countUsers, filter)
-	var count int64
-	err := row.Scan(&count)
-	return count, err
-}
-
-const createUser = `-- name: CreateUser :one
+const createUser = `-- name: CreateUser :exec
 INSERT INTO users (
-  uid,
-  username,
-  email,
-  nickname,
-  password_hash,
-  avatar_url
-) VALUES (
-  ?1,
-  ?2,
-  ?3,
-  ?4,
-  ?5,
-  ?6
-) RETURNING
-  uid,
-  username,
-  role,
-  email,
-  nickname,
-  avatar_url
+    username,
+    nickname,
+    password_hash,
+    email,
+    avatar_url
+  )
+VALUES ($1, $2, $3, $4, $5)
 `
 
 type CreateUserParams struct {
-	Uid          string
 	Username     string
-	Email        string
 	Nickname     string
 	PasswordHash string
+	Email        string
 	AvatarUrl    string
 }
 
-type CreateUserRow struct {
-	Uid       string
-	Username  string
-	Role      string
-	Email     string
-	Nickname  string
-	AvatarUrl string
-}
-
-func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (CreateUserRow, error) {
-	row := q.db.QueryRowContext(ctx, createUser,
-		arg.Uid,
+func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) error {
+	_, err := q.db.ExecContext(ctx, createUser,
 		arg.Username,
-		arg.Email,
 		arg.Nickname,
 		arg.PasswordHash,
+		arg.Email,
 		arg.AvatarUrl,
 	)
-	var i CreateUserRow
-	err := row.Scan(
-		&i.Uid,
-		&i.Username,
-		&i.Role,
-		&i.Email,
-		&i.Nickname,
-		&i.AvatarUrl,
-	)
-	return i, err
+	return err
 }
 
-const getUserAuthByAccount = `-- name: GetUserAuthByAccount :one
-SELECT
-  uid,
+const getUserByUid = `-- name: GetUserByUid :one
+SELECT uid,
   username,
   role,
   email,
   nickname,
   avatar_url,
-  password_hash
+  description,
+  status,
+  created_at
 FROM users
-WHERE (username = ?1 OR email = ?1)
-  AND status = 'NORMAL'
-LIMIT 1
-`
-
-type GetUserAuthByAccountRow struct {
-	Uid          string
-	Username     string
-	Role         string
-	Email        string
-	Nickname     string
-	AvatarUrl    string
-	PasswordHash string
-}
-
-func (q *Queries) GetUserAuthByAccount(ctx context.Context, account string) (GetUserAuthByAccountRow, error) {
-	row := q.db.QueryRowContext(ctx, getUserAuthByAccount, account)
-	var i GetUserAuthByAccountRow
-	err := row.Scan(
-		&i.Uid,
-		&i.Username,
-		&i.Role,
-		&i.Email,
-		&i.Nickname,
-		&i.AvatarUrl,
-		&i.PasswordHash,
-	)
-	return i, err
-}
-
-const getUserByUid = `-- name: GetUserByUid :one
-SELECT
-  uid,
-  username,
-  role,
-  email,
-  nickname,
-  avatar_url
-FROM users
-WHERE uid = ?1
-  AND status = 'NORMAL'
-LIMIT 1
+WHERE uid = $1
+  AND status = 'NORMAL'::user_status
 `
 
 type GetUserByUidRow struct {
-	Uid       string
-	Username  string
-	Role      string
-	Email     string
-	Nickname  string
-	AvatarUrl string
+	Uid         uuid.UUID
+	Username    string
+	Role        UserRole
+	Email       string
+	Nickname    string
+	AvatarUrl   string
+	Description string
+	Status      UserStatus
+	CreatedAt   time.Time
 }
 
-func (q *Queries) GetUserByUid(ctx context.Context, uid string) (GetUserByUidRow, error) {
+func (q *Queries) GetUserByUid(ctx context.Context, uid uuid.UUID) (GetUserByUidRow, error) {
 	row := q.db.QueryRowContext(ctx, getUserByUid, uid)
 	var i GetUserByUidRow
 	err := row.Scan(
@@ -182,130 +80,45 @@ func (q *Queries) GetUserByUid(ctx context.Context, uid string) (GetUserByUidRow
 		&i.Email,
 		&i.Nickname,
 		&i.AvatarUrl,
+		&i.Description,
+		&i.Status,
+		&i.CreatedAt,
 	)
 	return i, err
 }
 
-const getUserPasswordHashByUid = `-- name: GetUserPasswordHashByUid :one
-SELECT password_hash
-FROM users
-WHERE uid = ?1
-  AND status = 'NORMAL'
-LIMIT 1
-`
-
-func (q *Queries) GetUserPasswordHashByUid(ctx context.Context, uid string) (string, error) {
-	row := q.db.QueryRowContext(ctx, getUserPasswordHashByUid, uid)
-	var password_hash string
-	err := row.Scan(&password_hash)
-	return password_hash, err
-}
-
-const listUsers = `-- name: ListUsers :many
-SELECT
-  uid,
+const getUserByUsername = `-- name: GetUserByUsername :one
+SELECT uid,
   username,
   role,
   email,
   nickname,
-  avatar_url
+  avatar_url,
+  description,
+  status,
+  created_at,
+  password_hash
 FROM users
-WHERE status = 'NORMAL'
-  AND (
-    LENGTH(CAST(?1 AS TEXT)) = 0
-    OR username LIKE '%' || CAST(?1 AS TEXT) || '%'
-    OR email LIKE '%' || CAST(?1 AS TEXT) || '%'
-    OR nickname LIKE '%' || CAST(?1 AS TEXT) || '%'
-  )
-ORDER BY created_at DESC, id DESC
-LIMIT ?3
-OFFSET ?2
+WHERE username = $1
+  AND status = 'NORMAL'::user_status
 `
 
-type ListUsersParams struct {
-	Filter string
-	Offset int64
-	Limit  int64
+type GetUserByUsernameRow struct {
+	Uid          uuid.UUID
+	Username     string
+	Role         UserRole
+	Email        string
+	Nickname     string
+	AvatarUrl    string
+	Description  string
+	Status       UserStatus
+	CreatedAt    time.Time
+	PasswordHash string
 }
 
-type ListUsersRow struct {
-	Uid       string
-	Username  string
-	Role      string
-	Email     string
-	Nickname  string
-	AvatarUrl string
-}
-
-func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]ListUsersRow, error) {
-	rows, err := q.db.QueryContext(ctx, listUsers, arg.Filter, arg.Offset, arg.Limit)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []ListUsersRow
-	for rows.Next() {
-		var i ListUsersRow
-		if err := rows.Scan(
-			&i.Uid,
-			&i.Username,
-			&i.Role,
-			&i.Email,
-			&i.Nickname,
-			&i.AvatarUrl,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const updateUserByUid = `-- name: UpdateUserByUid :one
-UPDATE users
-SET
-  username   = COALESCE(?1, username),
-  email      = COALESCE(?2, email),
-  nickname   = COALESCE(?3, nickname),
-  avatar_url = COALESCE(?4, avatar_url),
-  updated_at = unixepoch()
-WHERE uid = ?5
-  AND status = 'NORMAL'
-RETURNING uid, username, role, email, nickname, avatar_url
-`
-
-type UpdateUserByUidParams struct {
-	Username  sql.NullString
-	Email     sql.NullString
-	Nickname  sql.NullString
-	AvatarUrl sql.NullString
-	Uid       string
-}
-
-type UpdateUserByUidRow struct {
-	Uid       string
-	Username  string
-	Role      string
-	Email     string
-	Nickname  string
-	AvatarUrl string
-}
-
-func (q *Queries) UpdateUserByUid(ctx context.Context, arg UpdateUserByUidParams) (UpdateUserByUidRow, error) {
-	row := q.db.QueryRowContext(ctx, updateUserByUid,
-		arg.Username,
-		arg.Email,
-		arg.Nickname,
-		arg.AvatarUrl,
-		arg.Uid,
-	)
-	var i UpdateUserByUidRow
+func (q *Queries) GetUserByUsername(ctx context.Context, username string) (GetUserByUsernameRow, error) {
+	row := q.db.QueryRowContext(ctx, getUserByUsername, username)
+	var i GetUserByUsernameRow
 	err := row.Scan(
 		&i.Uid,
 		&i.Username,
@@ -313,28 +126,40 @@ func (q *Queries) UpdateUserByUid(ctx context.Context, arg UpdateUserByUidParams
 		&i.Email,
 		&i.Nickname,
 		&i.AvatarUrl,
+		&i.Description,
+		&i.Status,
+		&i.CreatedAt,
+		&i.PasswordHash,
 	)
 	return i, err
 }
 
-const updateUserPasswordHashByUid = `-- name: UpdateUserPasswordHashByUid :execrows
+const updateUser = `-- name: UpdateUser :exec
 UPDATE users
-SET
-  password_hash = ?1,
-  updated_at = unixepoch()
-WHERE uid = ?2
-  AND status = 'NORMAL'
+SET username = COALESCE($2, username),
+  email = COALESCE($3, email),
+  nickname = COALESCE($4, nickname),
+  avatar_url = COALESCE($5, avatar_url),
+  updated_at = now()
+WHERE uid = $1
+  AND status = 'NORMAL'::user_status
 `
 
-type UpdateUserPasswordHashByUidParams struct {
-	PasswordHash string
-	Uid          string
+type UpdateUserParams struct {
+	Uid       uuid.UUID
+	Username  sql.NullString
+	Email     sql.NullString
+	Nickname  sql.NullString
+	AvatarUrl sql.NullString
 }
 
-func (q *Queries) UpdateUserPasswordHashByUid(ctx context.Context, arg UpdateUserPasswordHashByUidParams) (int64, error) {
-	result, err := q.db.ExecContext(ctx, updateUserPasswordHashByUid, arg.PasswordHash, arg.Uid)
-	if err != nil {
-		return 0, err
-	}
-	return result.RowsAffected()
+func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
+	_, err := q.db.ExecContext(ctx, updateUser,
+		arg.Uid,
+		arg.Username,
+		arg.Email,
+		arg.Nickname,
+		arg.AvatarUrl,
+	)
+	return err
 }

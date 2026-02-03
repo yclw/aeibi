@@ -7,33 +7,28 @@ package db
 
 import (
 	"context"
+	"time"
+
+	"github.com/google/uuid"
+	"github.com/lib/pq"
 )
 
 const createFile = `-- name: CreateFile :one
 INSERT INTO files (
-  url,
+    url,
+    name,
+    content_type,
+    size,
+    checksum,
+    uploader
+  )
+VALUES ($1, $2, $3, $4, $5, $6)
+RETURNING url,
   name,
   content_type,
   size,
   checksum,
   uploader
-) VALUES (
-  ?1,
-  ?2,
-  ?3,
-  ?4,
-  ?5,
-  ?6
-) RETURNING
-  id,
-  url,
-  name,
-  content_type,
-  size,
-  checksum,
-  uploader,
-  status,
-  created_at
 `
 
 type CreateFileParams struct {
@@ -42,10 +37,19 @@ type CreateFileParams struct {
 	ContentType string
 	Size        int64
 	Checksum    string
-	Uploader    string
+	Uploader    uuid.UUID
 }
 
-func (q *Queries) CreateFile(ctx context.Context, arg CreateFileParams) (File, error) {
+type CreateFileRow struct {
+	Url         string
+	Name        string
+	ContentType string
+	Size        int64
+	Checksum    string
+	Uploader    uuid.UUID
+}
+
+func (q *Queries) CreateFile(ctx context.Context, arg CreateFileParams) (CreateFileRow, error) {
 	row := q.db.QueryRowContext(ctx, createFile,
 		arg.Url,
 		arg.Name,
@@ -54,9 +58,46 @@ func (q *Queries) CreateFile(ctx context.Context, arg CreateFileParams) (File, e
 		arg.Checksum,
 		arg.Uploader,
 	)
-	var i File
+	var i CreateFileRow
 	err := row.Scan(
-		&i.ID,
+		&i.Url,
+		&i.Name,
+		&i.ContentType,
+		&i.Size,
+		&i.Checksum,
+		&i.Uploader,
+	)
+	return i, err
+}
+
+const getFileByURL = `-- name: GetFileByURL :one
+SELECT url,
+  name,
+  content_type,
+  size,
+  checksum,
+  uploader,
+  status,
+  created_at
+FROM files
+WHERE url = $1
+`
+
+type GetFileByURLRow struct {
+	Url         string
+	Name        string
+	ContentType string
+	Size        int64
+	Checksum    string
+	Uploader    uuid.UUID
+	Status      FileStatus
+	CreatedAt   time.Time
+}
+
+func (q *Queries) GetFileByURL(ctx context.Context, url string) (GetFileByURLRow, error) {
+	row := q.db.QueryRowContext(ctx, getFileByURL, url)
+	var i GetFileByURLRow
+	err := row.Scan(
 		&i.Url,
 		&i.Name,
 		&i.ContentType,
@@ -69,36 +110,50 @@ func (q *Queries) CreateFile(ctx context.Context, arg CreateFileParams) (File, e
 	return i, err
 }
 
-const getFileByURL = `-- name: GetFileByURL :one
-SELECT
-  id,
-  url,
+const getFilesByUrls = `-- name: GetFilesByUrls :many
+SELECT url,
   name,
   content_type,
   size,
-  checksum,
-  uploader,
-  status,
-  created_at
+  checksum
 FROM files
-WHERE url = ?1
-  AND status = 'NORMAL'
-LIMIT 1
+WHERE status = 'NORMAL'::file_status
+  AND url = ANY($1::text [])
 `
 
-func (q *Queries) GetFileByURL(ctx context.Context, url string) (File, error) {
-	row := q.db.QueryRowContext(ctx, getFileByURL, url)
-	var i File
-	err := row.Scan(
-		&i.ID,
-		&i.Url,
-		&i.Name,
-		&i.ContentType,
-		&i.Size,
-		&i.Checksum,
-		&i.Uploader,
-		&i.Status,
-		&i.CreatedAt,
-	)
-	return i, err
+type GetFilesByUrlsRow struct {
+	Url         string
+	Name        string
+	ContentType string
+	Size        int64
+	Checksum    string
+}
+
+func (q *Queries) GetFilesByUrls(ctx context.Context, urls []string) ([]GetFilesByUrlsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getFilesByUrls, pq.Array(urls))
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetFilesByUrlsRow
+	for rows.Next() {
+		var i GetFilesByUrlsRow
+		if err := rows.Scan(
+			&i.Url,
+			&i.Name,
+			&i.ContentType,
+			&i.Size,
+			&i.Checksum,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }

@@ -21,8 +21,8 @@ type ServerConfig struct {
 }
 
 type DatabaseConfig struct {
-	DSN           string `mapstructure:"dsn"`
-	MigrationsDir string `mapstructure:"migrations_dir"`
+	DSN              string `mapstructure:"dsn"`
+	MigrationsSource string `mapstructure:"migrations_source"`
 }
 
 type OSSConfig struct {

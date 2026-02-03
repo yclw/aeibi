@@ -2,3 +2,4 @@
 .idea/
 aeibi.db
 config.yaml
+.buf-deps/

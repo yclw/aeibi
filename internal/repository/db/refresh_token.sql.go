@@ -7,107 +7,46 @@ package db
 
 import (
 	"context"
+	"time"
+
+	"github.com/google/uuid"
 )
 
-const deleteRefreshToken = `-- name: DeleteRefreshToken :execrows
-DELETE FROM refresh_tokens
-WHERE uid = ?1
-`
-
-func (q *Queries) DeleteRefreshToken(ctx context.Context, uid string) (int64, error) {
-	result, err := q.db.ExecContext(ctx, deleteRefreshToken, uid)
-	if err != nil {
-		return 0, err
-	}
-	return result.RowsAffected()
-}
-
 const getRefreshToken = `-- name: GetRefreshToken :one
-SELECT
-  token,
-  created_at,
-  expires_at
+SELECT uid,
+  token
 FROM refresh_tokens
-WHERE uid = ?1
-LIMIT 1
+WHERE token = $1
+  AND expires_at > now()
 `
 
 type GetRefreshTokenRow struct {
-	Token     string
-	CreatedAt int64
-	ExpiresAt int64
+	Uid   uuid.UUID
+	Token string
 }
 
-func (q *Queries) GetRefreshToken(ctx context.Context, uid string) (GetRefreshTokenRow, error) {
-	row := q.db.QueryRowContext(ctx, getRefreshToken, uid)
+func (q *Queries) GetRefreshToken(ctx context.Context, token string) (GetRefreshTokenRow, error) {
+	row := q.db.QueryRowContext(ctx, getRefreshToken, token)
 	var i GetRefreshTokenRow
-	err := row.Scan(&i.Token, &i.CreatedAt, &i.ExpiresAt)
+	err := row.Scan(&i.Uid, &i.Token)
 	return i, err
 }
 
-const getRefreshTokenByToken = `-- name: GetRefreshTokenByToken :one
-SELECT
-  uid,
-  token,
-  created_at,
-  expires_at
-FROM refresh_tokens
-WHERE token = ?1
-LIMIT 1
-`
-
-type GetRefreshTokenByTokenRow struct {
-	Uid       string
-	Token     string
-	CreatedAt int64
-	ExpiresAt int64
-}
-
-func (q *Queries) GetRefreshTokenByToken(ctx context.Context, token string) (GetRefreshTokenByTokenRow, error) {
-	row := q.db.QueryRowContext(ctx, getRefreshTokenByToken, token)
-	var i GetRefreshTokenByTokenRow
-	err := row.Scan(
-		&i.Uid,
-		&i.Token,
-		&i.CreatedAt,
-		&i.ExpiresAt,
-	)
-	return i, err
-}
-
-const upsertRefreshToken = `-- name: UpsertRefreshToken :one
-INSERT INTO refresh_tokens (
-  uid,
-  token,
-  expires_at
-) VALUES (
-  ?1,
-  ?2,
-  ?3
-) ON CONFLICT(uid) DO UPDATE SET
-  token = excluded.token,
-  expires_at = excluded.expires_at
-RETURNING
-  token,
-  created_at,
-  expires_at
+const upsertRefreshToken = `-- name: UpsertRefreshToken :exec
+INSERT INTO refresh_tokens (uid, token, expires_at)
+VALUES ($1, $2, $3) ON CONFLICT (uid) DO
+UPDATE
+SET token = EXCLUDED.token,
+  expires_at = EXCLUDED.expires_at
 `
 
 type UpsertRefreshTokenParams struct {
-	Uid       string
+	Uid       uuid.UUID
 	Token     string
-	ExpiresAt int64
+	ExpiresAt time.Time
 }
 
-type UpsertRefreshTokenRow struct {
-	Token     string
-	CreatedAt int64
-	ExpiresAt int64
-}
-
-func (q *Queries) UpsertRefreshToken(ctx context.Context, arg UpsertRefreshTokenParams) (UpsertRefreshTokenRow, error) {
-	row := q.db.QueryRowContext(ctx, upsertRefreshToken, arg.Uid, arg.Token, arg.ExpiresAt)
-	var i UpsertRefreshTokenRow
-	err := row.Scan(&i.Token, &i.CreatedAt, &i.ExpiresAt)
-	return i, err
+func (q *Queries) UpsertRefreshToken(ctx context.Context, arg UpsertRefreshTokenParams) error {
+	_, err := q.db.ExecContext(ctx, upsertRefreshToken, arg.Uid, arg.Token, arg.ExpiresAt)
+	return err
 }

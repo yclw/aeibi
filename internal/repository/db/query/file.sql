@@ -1,33 +1,21 @@
 -- name: CreateFile :one
 INSERT INTO files (
-  url,
+    url,
+    name,
+    content_type,
+    size,
+    checksum,
+    uploader
+  )
+VALUES ($1, $2, $3, $4, $5, $6)
+RETURNING url,
   name,
   content_type,
   size,
   checksum,
-  uploader
-) VALUES (
-  sqlc.arg(url),
-  sqlc.arg(name),
-  sqlc.arg(content_type),
-  sqlc.arg(size),
-  sqlc.arg(checksum),
-  sqlc.arg(uploader)
-) RETURNING
-  id,
-  url,
-  name,
-  content_type,
-  size,
-  checksum,
-  uploader,
-  status,
-  created_at;
-
+  uploader;
 -- name: GetFileByURL :one
-SELECT
-  id,
-  url,
+SELECT url,
   name,
   content_type,
   size,
@@ -36,6 +24,13 @@ SELECT
   status,
   created_at
 FROM files
-WHERE url = sqlc.arg(url)
-  AND status = 'NORMAL'
-LIMIT 1;
+WHERE url = $1;
+-- name: GetFilesByUrls :many
+SELECT url,
+  name,
+  content_type,
+  size,
+  checksum
+FROM files
+WHERE status = 'NORMAL'::file_status
+  AND url = ANY(@urls::text []);

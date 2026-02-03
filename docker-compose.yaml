@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: aeibi-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: aeibi
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: aeibi
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql
+
+volumes:
+  postgres-data:

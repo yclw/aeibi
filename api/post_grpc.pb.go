@@ -22,6 +22,7 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	PostService_CreatePost_FullMethodName        = "/post.PostService/CreatePost"
 	PostService_ListPosts_FullMethodName         = "/post.PostService/ListPosts"
+	PostService_ListPostsByAuthor_FullMethodName = "/post.PostService/ListPostsByAuthor"
 	PostService_ListMyPosts_FullMethodName       = "/post.PostService/ListMyPosts"
 	PostService_ListMyCollections_FullMethodName = "/post.PostService/ListMyCollections"
 	PostService_GetPost_FullMethodName           = "/post.PostService/GetPost"
@@ -42,6 +43,8 @@ type PostServiceClient interface {
 	CreatePost(ctx context.Context, in *CreatePostRequest, opts ...grpc.CallOption) (*CreatePostResponse, error)
 	// GET /api/v1/posts 列表（公开）
 	ListPosts(ctx context.Context, in *ListPostsRequest, opts ...grpc.CallOption) (*ListPostsResponse, error)
+	// GET /api/v1/users/{uid}/posts 指定用户发布的列表（公开）
+	ListPostsByAuthor(ctx context.Context, in *ListPostsByAuthorRequest, opts ...grpc.CallOption) (*ListPostsResponse, error)
 	// GET /api/v1/me/posts 当前用户发布的列表（含 PRIVATE）
 	ListMyPosts(ctx context.Context, in *ListPostsRequest, opts ...grpc.CallOption) (*ListPostsResponse, error)
 	// GET /api/v1/me/collections 当前用户收藏的帖子列表
@@ -82,6 +85,16 @@ func (c *postServiceClient) ListPosts(ctx context.Context, in *ListPostsRequest,
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListPostsResponse)
 	err := c.cc.Invoke(ctx, PostService_ListPosts_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *postServiceClient) ListPostsByAuthor(ctx context.Context, in *ListPostsByAuthorRequest, opts ...grpc.CallOption) (*ListPostsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListPostsResponse)
+	err := c.cc.Invoke(ctx, PostService_ListPostsByAuthor_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -178,6 +191,8 @@ type PostServiceServer interface {
 	CreatePost(context.Context, *CreatePostRequest) (*CreatePostResponse, error)
 	// GET /api/v1/posts 列表（公开）
 	ListPosts(context.Context, *ListPostsRequest) (*ListPostsResponse, error)
+	// GET /api/v1/users/{uid}/posts 指定用户发布的列表（公开）
+	ListPostsByAuthor(context.Context, *ListPostsByAuthorRequest) (*ListPostsResponse, error)
 	// GET /api/v1/me/posts 当前用户发布的列表（含 PRIVATE）
 	ListMyPosts(context.Context, *ListPostsRequest) (*ListPostsResponse, error)
 	// GET /api/v1/me/collections 当前用户收藏的帖子列表
@@ -209,6 +224,9 @@ func (UnimplementedPostServiceServer) CreatePost(context.Context, *CreatePostReq
 }
 func (UnimplementedPostServiceServer) ListPosts(context.Context, *ListPostsRequest) (*ListPostsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListPosts not implemented")
+}
+func (UnimplementedPostServiceServer) ListPostsByAuthor(context.Context, *ListPostsByAuthorRequest) (*ListPostsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListPostsByAuthor not implemented")
 }
 func (UnimplementedPostServiceServer) ListMyPosts(context.Context, *ListPostsRequest) (*ListPostsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListMyPosts not implemented")
@@ -287,6 +305,24 @@ func _PostService_ListPosts_Handler(srv interface{}, ctx context.Context, dec fu
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PostServiceServer).ListPosts(ctx, req.(*ListPostsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PostService_ListPostsByAuthor_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListPostsByAuthorRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PostServiceServer).ListPostsByAuthor(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PostService_ListPostsByAuthor_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PostServiceServer).ListPostsByAuthor(ctx, req.(*ListPostsByAuthorRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -449,6 +485,10 @@ var PostService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListPosts",
 			Handler:    _PostService_ListPosts_Handler,
+		},
+		{
+			MethodName: "ListPostsByAuthor",
+			Handler:    _PostService_ListPostsByAuthor_Handler,
 		},
 		{
 			MethodName: "ListMyPosts",

@@ -4,78 +4,297 @@
 
 package db
 
+import (
+	"database/sql/driver"
+	"fmt"
+	"time"
+
+	"github.com/google/uuid"
+)
+
+type FileStatus string
+
+const (
+	FileStatusNORMAL   FileStatus = "NORMAL"
+	FileStatusARCHIVED FileStatus = "ARCHIVED"
+)
+
+func (e *FileStatus) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = FileStatus(s)
+	case string:
+		*e = FileStatus(s)
+	default:
+		return fmt.Errorf("unsupported scan type for FileStatus: %T", src)
+	}
+	return nil
+}
+
+type NullFileStatus struct {
+	FileStatus FileStatus
+	Valid      bool // Valid is true if FileStatus is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullFileStatus) Scan(value interface{}) error {
+	if value == nil {
+		ns.FileStatus, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.FileStatus.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullFileStatus) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.FileStatus), nil
+}
+
+type PostStatus string
+
+const (
+	PostStatusNORMAL   PostStatus = "NORMAL"
+	PostStatusARCHIVED PostStatus = "ARCHIVED"
+)
+
+func (e *PostStatus) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = PostStatus(s)
+	case string:
+		*e = PostStatus(s)
+	default:
+		return fmt.Errorf("unsupported scan type for PostStatus: %T", src)
+	}
+	return nil
+}
+
+type NullPostStatus struct {
+	PostStatus PostStatus
+	Valid      bool // Valid is true if PostStatus is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullPostStatus) Scan(value interface{}) error {
+	if value == nil {
+		ns.PostStatus, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.PostStatus.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullPostStatus) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.PostStatus), nil
+}
+
+type PostVisibility string
+
+const (
+	PostVisibilityPUBLIC  PostVisibility = "PUBLIC"
+	PostVisibilityPRIVATE PostVisibility = "PRIVATE"
+)
+
+func (e *PostVisibility) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = PostVisibility(s)
+	case string:
+		*e = PostVisibility(s)
+	default:
+		return fmt.Errorf("unsupported scan type for PostVisibility: %T", src)
+	}
+	return nil
+}
+
+type NullPostVisibility struct {
+	PostVisibility PostVisibility
+	Valid          bool // Valid is true if PostVisibility is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullPostVisibility) Scan(value interface{}) error {
+	if value == nil {
+		ns.PostVisibility, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.PostVisibility.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullPostVisibility) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.PostVisibility), nil
+}
+
+type UserRole string
+
+const (
+	UserRoleHOST  UserRole = "HOST"
+	UserRoleADMIN UserRole = "ADMIN"
+	UserRoleUSER  UserRole = "USER"
+)
+
+func (e *UserRole) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = UserRole(s)
+	case string:
+		*e = UserRole(s)
+	default:
+		return fmt.Errorf("unsupported scan type for UserRole: %T", src)
+	}
+	return nil
+}
+
+type NullUserRole struct {
+	UserRole UserRole
+	Valid    bool // Valid is true if UserRole is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullUserRole) Scan(value interface{}) error {
+	if value == nil {
+		ns.UserRole, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.UserRole.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullUserRole) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.UserRole), nil
+}
+
+type UserStatus string
+
+const (
+	UserStatusNORMAL   UserStatus = "NORMAL"
+	UserStatusARCHIVED UserStatus = "ARCHIVED"
+)
+
+func (e *UserStatus) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = UserStatus(s)
+	case string:
+		*e = UserStatus(s)
+	default:
+		return fmt.Errorf("unsupported scan type for UserStatus: %T", src)
+	}
+	return nil
+}
+
+type NullUserStatus struct {
+	UserStatus UserStatus
+	Valid      bool // Valid is true if UserStatus is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullUserStatus) Scan(value interface{}) error {
+	if value == nil {
+		ns.UserStatus, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.UserStatus.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullUserStatus) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.UserStatus), nil
+}
+
 type File struct {
-	ID          int64
+	ID          int32
 	Url         string
 	Name        string
 	ContentType string
 	Size        int64
 	Checksum    string
-	Uploader    string
-	Status      string
-	CreatedAt   int64
+	Uploader    uuid.UUID
+	Status      FileStatus
+	CreatedAt   time.Time
 }
 
 type Post struct {
-	ID              int64
-	Uid             string
-	Author          string
+	ID              int32
+	Uid             uuid.UUID
+	Author          uuid.UUID
 	Text            string
-	Images          string
-	Attachments     string
-	CommentCount    int64
-	CollectionCount int64
-	LikeCount       int64
-	Pinned          int64
-	Visibility      string
-	LatestRepliedOn int64
+	Images          []string
+	Attachments     []string
+	CommentCount    int32
+	CollectionCount int32
+	LikeCount       int32
+	Pinned          bool
+	Visibility      PostVisibility
+	LatestRepliedOn time.Time
 	Ip              string
-	Status          string
-	CreatedAt       int64
-	UpdatedAt       int64
+	Status          PostStatus
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
 }
 
 type PostCollection struct {
-	PostUid   string
-	UserUid   string
-	CreatedAt int64
+	PostUid   uuid.UUID
+	UserUid   uuid.UUID
+	CreatedAt time.Time
 }
 
 type PostLike struct {
-	PostUid   string
-	UserUid   string
-	CreatedAt int64
+	PostUid   uuid.UUID
+	UserUid   uuid.UUID
+	CreatedAt time.Time
 }
 
 type PostTag struct {
-	PostID int64
-	TagID  int64
+	PostID int32
+	TagID  int32
 }
 
 type RefreshToken struct {
-	ID        int64
-	Uid       string
+	ID        int32
+	Uid       uuid.UUID
 	Token     string
-	ExpiresAt int64
-	CreatedAt int64
+	ExpiresAt time.Time
+	CreatedAt time.Time
 }
 
 type Tag struct {
-	ID   int64
+	ID   int32
 	Name string
 }
 
 type User struct {
-	ID           int64
-	Uid          string
+	ID           int32
+	Uid          uuid.UUID
 	Username     string
-	Role         string
+	Role         UserRole
 	Email        string
 	Nickname     string
 	PasswordHash string
 	AvatarUrl    string
 	Description  string
-	Status       string
-	CreatedAt    int64
-	UpdatedAt    int64
+	Status       UserStatus
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
 }

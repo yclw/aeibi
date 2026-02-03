@@ -4,6 +4,7 @@ import (
 	"aeibi/api"
 	"aeibi/internal/repository/db"
 	"aeibi/internal/repository/oss"
+	"aeibi/util"
 	"context"
 	"database/sql"
 	"errors"
@@ -35,20 +36,17 @@ func (s *FileService) UploadFile(ctx context.Context, uploader string, req *api.
 	if contentType == "" {
 		contentType = "application/octet-stream"
 	}
-
 	key := uuid.NewString() + path.Ext(req.Name)
-
 	if _, err := s.oss.PutObject(ctx, key, req.Data, contentType); err != nil {
 		return nil, fmt.Errorf("upload object: %w", err)
 	}
-
 	row, err := s.db.CreateFile(ctx, db.CreateFileParams{
 		Url:         key,
 		Name:        req.Name,
 		ContentType: contentType,
 		Size:        int64(len(req.Data)),
 		Checksum:    req.Checksum,
-		Uploader:    uploader,
+		Uploader:    util.UUID(uploader),
 	})
 	if err != nil {
 		return nil, fmt.Errorf("save file: %w", err)
@@ -60,8 +58,7 @@ func (s *FileService) UploadFile(ctx context.Context, uploader string, req *api.
 			ContentType: row.ContentType,
 			Size:        row.Size,
 			Checksum:    row.Checksum,
-			Uploader:    row.Uploader,
-			CreatedAt:   row.CreatedAt,
+			Uploader:    row.Uploader.String(),
 		},
 		Url: row.Url,
 	}, nil
@@ -82,23 +79,15 @@ func (s *FileService) GetFileMeta(ctx context.Context, req *api.GetFileMetaReque
 			ContentType: row.ContentType,
 			Size:        row.Size,
 			Checksum:    row.Checksum,
-			Uploader:    row.Uploader,
-			CreatedAt:   row.CreatedAt,
+			Uploader:    row.Uploader.String(),
+			CreatedAt:   row.CreatedAt.Unix(),
 		},
 		Url: row.Url,
 	}, nil
 }
 
 func (s *FileService) GetFile(ctx context.Context, req *api.GetFileRequest) (*httpbody.HttpBody, error) {
-	row, err := s.db.GetFileByURL(ctx, req.Url)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, fmt.Errorf("file not found")
-		}
-		return nil, fmt.Errorf("get file: %w", err)
-	}
-
-	reader, info, err := s.oss.GetObject(ctx, row.Url)
+	reader, _, err := s.oss.GetObject(ctx, req.Url)
 	if err != nil {
 		if errors.Is(err, oss.ErrObjectNotFound) {
 			return nil, fmt.Errorf("file not found")
@@ -112,14 +101,7 @@ func (s *FileService) GetFile(ctx context.Context, req *api.GetFileRequest) (*ht
 		return nil, fmt.Errorf("read object: %w", err)
 	}
 
-	contentType := row.ContentType
-	if contentType == "" {
-		contentType = info.ContentType
-	}
-	if contentType == "" {
-		contentType = "application/octet-stream"
-	}
-
+	contentType := "application/octet-stream"
 	return &httpbody.HttpBody{
 		ContentType: contentType,
 		Data:        data,

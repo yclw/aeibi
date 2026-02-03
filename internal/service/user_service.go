@@ -10,7 +10,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"strconv"
 	"time"
 
 	"github.com/google/uuid"
@@ -34,20 +33,18 @@ func NewUserService(dbx *sql.DB, ossClient *oss.OSS, cfg *config.Config) *UserSe
 }
 
 func (s *UserService) CreateUser(ctx context.Context, req *api.CreateUserRequest) error {
+	uid := uuid.New()
+	avatar, err := util.GenerateDefaultAvatar(uid.String())
+	if err != nil {
+		return fmt.Errorf("generate default avatar: %w", err)
+	}
+	avatarKey := fmt.Sprintf("avatars/%s.png", uid)
+	passwordHash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return fmt.Errorf("hash password: %w", err)
+	}
 	if err := db.WithTx(ctx, s.dbx, s.db, func(qtx *db.Queries) error {
-		uid := uuid.NewString()
-
-		avatar, err := util.GenerateDefaultAvatar(uid)
-		if err != nil {
-			return fmt.Errorf("generate default avatar: %w", err)
-		}
-		avatarKey := fmt.Sprintf("avatars/%s.png", uid)
-		passwordHash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
-		if err != nil {
-			return fmt.Errorf("hash password: %w", err)
-		}
-		_, err = qtx.CreateUser(ctx, db.CreateUserParams{
-			Uid:          uid,
+		err = qtx.CreateUser(ctx, db.CreateUserParams{
 			Username:     req.Username,
 			Email:        req.Email,
 			Nickname:     req.Nickname,
@@ -67,135 +64,28 @@ func (s *UserService) CreateUser(ctx context.Context, req *api.CreateUserRequest
 	return nil
 }
 
-func (s *UserService) ListUsers(ctx context.Context, req *api.ListUsersRequest) (*api.ListUsersResponse, error) {
-	pageSize := req.PageSize
-	if pageSize <= 0 {
-		pageSize = 20
-	} else if pageSize > 100 {
-		pageSize = 100
-	}
-
-	var offset int64
-	if req.PageToken != "" {
-		o, err := strconv.ParseInt(req.PageToken, 10, 64)
-		if err != nil {
-			return nil, fmt.Errorf("invalid page token: %w", err)
-		}
-		if o > 0 {
-			offset = o
-		}
-	}
-
-	total, err := s.db.CountUsers(ctx, req.Filter)
-	if err != nil {
-		return nil, fmt.Errorf("count users: %w", err)
-	}
-
-	rows, err := s.db.ListUsers(ctx, db.ListUsersParams{
-		Filter: req.Filter,
-		Offset: offset,
-		Limit:  int64(pageSize),
-	})
-	if err != nil {
-		return nil, fmt.Errorf("list users: %w", err)
-	}
-
-	users := make([]*api.User, 0, len(rows))
-	for _, row := range rows {
-		users = append(users, &api.User{
-			Uid:       row.Uid,
-			Username:  row.Username,
-			Role:      row.Role,
-			Email:     row.Email,
-			Nickname:  row.Nickname,
-			AvatarUrl: row.AvatarUrl,
-		})
-	}
-
-	nextPageToken := ""
-	if offset+int64(len(rows)) < total {
-		nextPageToken = strconv.FormatInt(offset+int64(len(rows)), 10)
-	}
-
-	return &api.ListUsersResponse{
-		Users:         users,
-		NextPageToken: nextPageToken,
-		TotalSize:     total,
-	}, nil
-}
-
 func (s *UserService) GetUser(ctx context.Context, req *api.GetUserRequest) (*api.GetUserResponse, error) {
-	row, err := s.db.GetUserByUid(ctx, req.Uid)
+	row, err := s.db.GetUserByUid(ctx, util.UUID(req.Uid))
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, fmt.Errorf("user not found")
 		}
 		return nil, fmt.Errorf("get user: %w", err)
 	}
-
 	return &api.GetUserResponse{
 		User: &api.User{
-			Uid:       row.Uid,
+			Uid:       row.Uid.String(),
 			Username:  row.Username,
-			Role:      row.Role,
+			Role:      string(row.Role),
 			Email:     row.Email,
 			Nickname:  row.Nickname,
 			AvatarUrl: row.AvatarUrl,
 		},
 	}, nil
-}
-
-func (s *UserService) UpdateUser(ctx context.Context, req *api.UpdateUserRequest) (*api.UpdateUserResponse, error) {
-	params := db.UpdateUserByUidParams{Uid: req.Uid}
-
-	if req.Username != nil {
-		params.Username = s.nsPtr(req.Username)
-	}
-	if req.Email != nil {
-		params.Email = s.nsPtr(req.Email)
-	}
-	if req.Nickname != nil {
-		params.Nickname = s.nsPtr(req.Nickname)
-	}
-	if req.AvatarUrl != nil {
-		params.AvatarUrl = s.nsPtr(req.AvatarUrl)
-	}
-
-	row, err := s.db.UpdateUserByUid(ctx, params)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, fmt.Errorf("user not found")
-		}
-		return nil, fmt.Errorf("update user: %w", err)
-	}
-
-	return &api.UpdateUserResponse{
-		User: &api.User{
-			Uid:       row.Uid,
-			Username:  row.Username,
-			Role:      row.Role,
-			Email:     row.Email,
-			Nickname:  row.Nickname,
-			AvatarUrl: row.AvatarUrl,
-		},
-	}, nil
-}
-
-func (s *UserService) DeleteUser(ctx context.Context, req *api.DeleteUserRequest) error {
-	return db.WithTx(ctx, s.dbx, s.db, func(qtx *db.Queries) error {
-		affected, err := qtx.ArchiveUserByUid(ctx, req.Uid)
-		if err != nil {
-			return fmt.Errorf("archive user: %w", err)
-		}
-		if affected == 0 {
-			return fmt.Errorf("user not found or already archived")
-		}
-		return nil
-	})
 }
 
 func (s *UserService) GetMe(ctx context.Context, uid string) (*api.GetMeResponse, error) {
-	row, err := s.db.GetUserByUid(ctx, uid)
+	row, err := s.db.GetUserByUid(ctx, util.UUID(uid))
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, fmt.Errorf("user not found")
@@ -205,9 +95,9 @@ func (s *UserService) GetMe(ctx context.Context, uid string) (*api.GetMeResponse
 
 	return &api.GetMeResponse{
 		User: &api.User{
-			Uid:       row.Uid,
+			Uid:       row.Uid.String(),
 			Username:  row.Username,
-			Role:      row.Role,
+			Role:      string(row.Role),
 			Email:     row.Email,
 			Nickname:  row.Nickname,
 			AvatarUrl: row.AvatarUrl,
@@ -216,56 +106,43 @@ func (s *UserService) GetMe(ctx context.Context, uid string) (*api.GetMeResponse
 }
 
 func (s *UserService) UpdateMe(ctx context.Context, uid string, req *api.UpdateMeRequest) error {
-	params := db.UpdateUserByUidParams{Uid: uid}
-
-	if req.Username != nil {
-		params.Username = s.nsPtr(req.Username)
-	}
-	if req.Email != nil {
-		params.Email = s.nsPtr(req.Email)
-	}
-	if req.Nickname != nil {
-		params.Nickname = s.nsPtr(req.Nickname)
-	}
-	if req.AvatarUrl != nil {
-		params.AvatarUrl = s.nsPtr(req.AvatarUrl)
-	}
-
-	_, err := s.db.UpdateUserByUid(ctx, params)
+	params := db.UpdateUserParams{Uid: util.UUID(uid)}
+	params.Username = s.nsPtr(req.Username)
+	params.Email = s.nsPtr(req.Email)
+	params.Nickname = s.nsPtr(req.Nickname)
+	params.AvatarUrl = s.nsPtr(req.AvatarUrl)
+	err := s.db.UpdateUser(ctx, params)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return fmt.Errorf("user not found")
 		}
 		return fmt.Errorf("update user: %w", err)
 	}
-
 	return nil
 }
 
 func (s *UserService) Login(ctx context.Context, req *api.LoginRequest) (*api.LoginResponse, error) {
 	var resp *api.LoginResponse
 	if err := db.WithTx(ctx, s.dbx, s.db, func(qtx *db.Queries) error {
-		row, err := qtx.GetUserAuthByAccount(ctx, req.Account)
+		row, err := qtx.GetUserByUsername(ctx, req.Account)
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
 				return fmt.Errorf("invalid credentials")
 			}
 			return fmt.Errorf("get user: %w", err)
 		}
-
 		if err := bcrypt.CompareHashAndPassword([]byte(row.PasswordHash), []byte(req.Password)); err != nil {
 			return fmt.Errorf("invalid credentials")
 		}
-
-		accessToken, refreshToken, err := s.genToken(row.Uid)
+		accessToken, refreshToken, err := s.genToken(row.Uid.String())
 		if err != nil {
 			return err
 		}
 
-		if _, err := qtx.UpsertRefreshToken(ctx, db.UpsertRefreshTokenParams{
+		if err := qtx.UpsertRefreshToken(ctx, db.UpsertRefreshTokenParams{
 			Uid:       row.Uid,
 			Token:     refreshToken,
-			ExpiresAt: time.Now().Add(s.cfg.Auth.RefreshTTL).Unix(),
+			ExpiresAt: time.Now().Add(s.cfg.Auth.RefreshTTL),
 		}); err != nil {
 			return fmt.Errorf("save refresh token: %w", err)
 		}
@@ -287,7 +164,7 @@ func (s *UserService) Login(ctx context.Context, req *api.LoginRequest) (*api.Lo
 func (s *UserService) RefreshToken(ctx context.Context, req *api.RefreshTokenRequest) (*api.RefreshTokenResponse, error) {
 	var resp *api.RefreshTokenResponse
 	if err := db.WithTx(ctx, s.dbx, s.db, func(qtx *db.Queries) error {
-		row, err := qtx.GetRefreshTokenByToken(ctx, req.RefreshToken)
+		row, err := qtx.GetRefreshToken(ctx, req.RefreshToken)
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
 				return fmt.Errorf("invalid refresh token")
@@ -296,20 +173,16 @@ func (s *UserService) RefreshToken(ctx context.Context, req *api.RefreshTokenReq
 		}
 
 		now := time.Now()
-		if now.Unix() >= row.ExpiresAt {
-			return fmt.Errorf("refresh token expired")
-		}
-
 		uid := row.Uid
-		accessToken, refreshToken, err := s.genToken(uid)
+		accessToken, refreshToken, err := s.genToken(uid.String())
 		if err != nil {
 			return err
 		}
 
-		if _, err := qtx.UpsertRefreshToken(ctx, db.UpsertRefreshTokenParams{
+		if err := qtx.UpsertRefreshToken(ctx, db.UpsertRefreshTokenParams{
 			Uid:       uid,
 			Token:     refreshToken,
-			ExpiresAt: now.Add(s.cfg.Auth.RefreshTTL).Unix(),
+			ExpiresAt: now.Add(s.cfg.Auth.RefreshTTL),
 		}); err != nil {
 			return fmt.Errorf("save refresh token: %w", err)
 		}
@@ -326,36 +199,6 @@ func (s *UserService) RefreshToken(ctx context.Context, req *api.RefreshTokenReq
 	}
 
 	return resp, nil
-}
-
-func (s *UserService) ChangePassword(ctx context.Context, uid string, req *api.ChangePasswordRequest) error {
-	return db.WithTx(ctx, s.dbx, s.db, func(qtx *db.Queries) error {
-		oldHash, err := qtx.GetUserPasswordHashByUid(ctx, uid)
-		if err != nil {
-			if errors.Is(err, sql.ErrNoRows) {
-				return fmt.Errorf("user not found")
-			}
-			return fmt.Errorf("get password: %w", err)
-		}
-
-		if err := bcrypt.CompareHashAndPassword([]byte(oldHash), []byte(req.OldPassword)); err != nil {
-			return fmt.Errorf("old password incorrect")
-		}
-
-		newHash, err := bcrypt.GenerateFromPassword([]byte(req.NewPassword), bcrypt.DefaultCost)
-		if err != nil {
-			return fmt.Errorf("hash password: %w", err)
-		}
-
-		if _, err := qtx.UpdateUserPasswordHashByUid(ctx, db.UpdateUserPasswordHashByUidParams{
-			PasswordHash: string(newHash),
-			Uid:          uid,
-		}); err != nil {
-			return fmt.Errorf("update password: %w", err)
-		}
-
-		return nil
-	})
 }
 
 func (s *UserService) nsPtr(p *string) sql.NullString {

@@ -18,32 +18,10 @@ service UserService {
     };
   }
 
-  // GET /api/v1/users 列表
-  rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {
-    option (google.api.http) = {
-      get: "/api/v1/users"
-    };
-  }
-
   // GET /api/v1/users/{uid} 详情
   rpc GetUser(GetUserRequest) returns (GetUserResponse) {
     option (google.api.http) = {
       get: "/api/v1/users/{uid}"
-    };
-  }
-
-  // PATCH /api/v1/users/{uid} 更新
-  rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {
-    option (google.api.http) = {
-      patch: "/api/v1/users/{uid}"
-      body : "*"
-    };
-  }
-
-  // DELETE /api/v1/users/{uid} 删除（软删）
-  rpc DeleteUser(DeleteUserRequest) returns (google.protobuf.Empty) {
-    option (google.api.http) = {
-      delete: "/api/v1/users/{uid}"
     };
   }
 
@@ -77,14 +55,6 @@ service UserService {
       body: "*"
     };
   }
-
-  // POST /api/v1/me/password 改密码
-  rpc ChangePassword(ChangePasswordRequest) returns (google.protobuf.Empty) {
-    option (google.api.http) = {
-      post: "/api/v1/me/password"
-      body: "*"
-    };
-  }
 }
 
 // -------------------- Messages --------------------
@@ -107,21 +77,6 @@ message CreateUserRequest {
   string nickname = 4;
 }
 
-// List
-
-message ListUsersRequest {
-  int32  page_size  = 1;
-  string page_token = 2;
-  string filter     = 3;
-  string order_by   = 4;
-}
-
-message ListUsersResponse {
-  repeated User users           = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
-  string        next_page_token = 2 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
-  int64         total_size      = 3 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
-}
-
 // Get
 
 message GetUserRequest {
@@ -130,26 +85,6 @@ message GetUserRequest {
 
 message GetUserResponse {
   User user = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
-}
-
-// Update
-
-message UpdateUserRequest {
-  string uid = 1;
-  optional string username   = 2;
-  optional string email      = 3;
-  optional string nickname   = 4;
-  optional string avatar_url = 5;
-}
-
-message UpdateUserResponse {
-  User user = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
-}
-
-// Delete
-
-message DeleteUserRequest {
-  string uid = 1;
 }
 
 // Me
@@ -190,10 +125,4 @@ message RefreshTokenResponse {
 message TokenPair {
   string access_token  = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
   string refresh_token = 2 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
-}
-
-// Password
-message ChangePasswordRequest {
-  string old_password = 1;
-  string new_password = 2;
 }

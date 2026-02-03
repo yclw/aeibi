@@ -1,6 +1,13 @@
 version: "2"
 sql:
-  - engine: "sqlite"
+  # - engine: "sqlite"
+  #   queries: "internal/repository/db/query"
+  #   schema: "internal/repository/db/migration"
+  #   gen:
+  #     go:
+  #       package: "db"
+  #       out: "internal/repository/db"
+  - engine: "postgresql"
     queries: "internal/repository/db/query"
     schema: "internal/repository/db/migration"
     gen:

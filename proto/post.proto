@@ -96,46 +96,48 @@ service PostService {
 // -------------------- Messages --------------------
 
 message PostAuthor {
-  string uid        = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
-  string nickname   = 2 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
-  string avatar_url = 3 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  string uid        = 1 [(google.api.field_behavior) = REQUIRED];
+  string nickname   = 2 [(google.api.field_behavior) = REQUIRED];
+  string avatar_url = 3 [(google.api.field_behavior) = REQUIRED];
 }
 
 message Attachment {
-  string url          = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
-  string name         = 2 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
-  int64  size         = 3 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
-  string content_type = 4 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
-  string checksum     = 5 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  string url          = 1 [(google.api.field_behavior) = REQUIRED];
+  string name         = 2 [(google.api.field_behavior) = REQUIRED];
+  int64  size         = 3 [(google.api.field_behavior) = REQUIRED];
+  string content_type = 4 [(google.api.field_behavior) = REQUIRED];
+  string checksum     = 5 [(google.api.field_behavior) = REQUIRED];
 }
 
 message Post {
-  string              uid               = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
-  PostAuthor          author            = 2 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
-  string              text              = 3 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
-  repeated string     images            = 4 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
-  repeated Attachment attachments       = 5 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
-  repeated string     tags              = 6 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
-  int32               comment_count     = 7 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
-  int32               collection_count  = 8 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
-  int32               like_count        = 9 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
-  string              visibility        = 10 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
-  int64               latest_replied_on = 11 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
-  string              ip                = 12 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
-  bool                pinned            = 13 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
-  int64               created_at        = 14 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
-  int64               updated_at        = 15 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  string              uid               = 1 [(google.api.field_behavior) = REQUIRED];
+  PostAuthor          author            = 2 [(google.api.field_behavior) = REQUIRED];
+  string              text              = 3 [(google.api.field_behavior) = REQUIRED];
+  repeated string     images            = 4 [(google.api.field_behavior) = REQUIRED];
+  repeated Attachment attachments       = 5 [(google.api.field_behavior) = REQUIRED];
+  repeated string     tags              = 6 [(google.api.field_behavior) = REQUIRED];
+  int32               comment_count     = 7 [(google.api.field_behavior) = REQUIRED];
+  int32               collection_count  = 8 [(google.api.field_behavior) = REQUIRED];
+  int32               like_count        = 9 [(google.api.field_behavior) = REQUIRED];
+  string              visibility        = 10 [(google.api.field_behavior) = REQUIRED];
+  int64               latest_replied_on = 11 [(google.api.field_behavior) = REQUIRED];
+  string              ip                = 12 [(google.api.field_behavior) = REQUIRED];
+  bool                pinned            = 13 [(google.api.field_behavior) = REQUIRED];
+  bool                liked             = 14 [(google.api.field_behavior) = REQUIRED];
+  bool                collected         = 15 [(google.api.field_behavior) = REQUIRED];
+  int64               created_at        = 16 [(google.api.field_behavior) = REQUIRED];
+  int64               updated_at        = 17 [(google.api.field_behavior) = REQUIRED];
 }
 
 enum ToggleAction {
-  TOGGLE_ACTION_ADD         = 0;
-  TOGGLE_ACTION_REMOVE      = 1;
+  TOGGLE_ACTION_ADD    = 0;
+  TOGGLE_ACTION_REMOVE = 1;
 }
 
 // Create
 
 message CreatePostRequest {
-  string          text        = 1;
+  string          text        = 1 [(google.api.field_behavior) = REQUIRED];
   repeated string images      = 2;
   repeated string attachments = 3;
   repeated string tags        = 4;
@@ -144,7 +146,7 @@ message CreatePostRequest {
 }
 
 message CreatePostResponse {
-  string uid = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  string uid = 1 [(google.api.field_behavior) = REQUIRED];
 }
 
 // List
@@ -155,25 +157,25 @@ message ListPostsRequest {
 }
 
 message ListPostsByAuthorRequest {
-  string uid               = 1;
+  string uid               = 1 [(google.api.field_behavior) = REQUIRED];
   int64  cursor_created_at = 2; // unix seconds
   string cursor_id         = 3;
 }
 
 message ListPostsResponse {
-  repeated Post posts                  = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
-  int64         next_cursor_created_at = 2 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
-  string        next_cursor_id         = 3 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  repeated Post posts                  = 1 [(google.api.field_behavior) = REQUIRED];
+  int64         next_cursor_created_at = 2 [(google.api.field_behavior) = REQUIRED];
+  string        next_cursor_id         = 3 [(google.api.field_behavior) = REQUIRED];
 }
 
 // Get
 
 message GetPostRequest {
-  string uid = 1;
+  string uid = 1 [(google.api.field_behavior) = REQUIRED];
 }
 
 message GetPostResponse {
-  Post post = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  Post post = 1 [(google.api.field_behavior) = REQUIRED];
 }
 
 // Update
@@ -188,33 +190,33 @@ message UpdatePostBody {
 }
 
 message UpdatePostRequest {
-  string                     uid         = 1;
-  UpdatePostBody             post        = 2;
-  google.protobuf.FieldMask  update_mask = 3;
+  string                    uid         = 1 [(google.api.field_behavior) = REQUIRED];
+  UpdatePostBody            post        = 2 [(google.api.field_behavior) = REQUIRED];
+  google.protobuf.FieldMask update_mask = 3 [(google.api.field_behavior) = REQUIRED];
 }
 
 // Delete
 
 message DeletePostRequest {
-  string uid = 1;
+  string uid = 1 [(google.api.field_behavior) = REQUIRED];
 }
 
 // Like / Collect
 
 message LikePostRequest {
-  string       uid    = 1;
+  string       uid    = 1 [(google.api.field_behavior) = REQUIRED];
   ToggleAction action = 2;
 }
 
 message LikePostResponse {
-  int32 count = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  int32 count = 1 [(google.api.field_behavior) = REQUIRED];
 }
 
 message CollectPostRequest {
-  string       uid    = 1;
+  string       uid    = 1 [(google.api.field_behavior) = REQUIRED];
   ToggleAction action = 2;
 }
 
 message CollectPostResponse {
-  int32 count = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  int32 count = 1 [(google.api.field_behavior) = REQUIRED];
 }

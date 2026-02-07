@@ -221,8 +221,10 @@ type Post struct {
 	LatestRepliedOn int64                  `protobuf:"varint,11,opt,name=latest_replied_on,json=latestRepliedOn,proto3" json:"latest_replied_on,omitempty"`
 	Ip              string                 `protobuf:"bytes,12,opt,name=ip,proto3" json:"ip,omitempty"`
 	Pinned          bool                   `protobuf:"varint,13,opt,name=pinned,proto3" json:"pinned,omitempty"`
-	CreatedAt       int64                  `protobuf:"varint,14,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt       int64                  `protobuf:"varint,15,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	Liked           bool                   `protobuf:"varint,14,opt,name=liked,proto3" json:"liked,omitempty"`
+	Collected       bool                   `protobuf:"varint,15,opt,name=collected,proto3" json:"collected,omitempty"`
+	CreatedAt       int64                  `protobuf:"varint,16,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt       int64                  `protobuf:"varint,17,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -344,6 +346,20 @@ func (x *Post) GetIp() string {
 func (x *Post) GetPinned() bool {
 	if x != nil {
 		return x.Pinned
+	}
+	return false
+}
+
+func (x *Post) GetLiked() bool {
+	if x != nil {
+		return x.Liked
+	}
+	return false
+}
+
+func (x *Post) GetCollected() bool {
+	if x != nil {
+		return x.Collected
 	}
 	return false
 }
@@ -1135,70 +1151,72 @@ var File_post_proto protoreflect.FileDescriptor
 const file_post_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"post.proto\x12\x04post\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a google/protobuf/field_mask.proto\"q\n" +
+	"post.proto\x12\x04post\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a google/protobuf/field_mask.proto\"h\n" +
 	"\n" +
-	"PostAuthor\x12\x18\n" +
-	"\x03uid\x18\x01 \x01(\tB\x06\xe0A\x03\xe0A\x02R\x03uid\x12\"\n" +
-	"\bnickname\x18\x02 \x01(\tB\x06\xe0A\x03\xe0A\x02R\bnickname\x12%\n" +
+	"PostAuthor\x12\x15\n" +
+	"\x03uid\x18\x01 \x01(\tB\x03\xe0A\x02R\x03uid\x12\x1f\n" +
+	"\bnickname\x18\x02 \x01(\tB\x03\xe0A\x02R\bnickname\x12\"\n" +
 	"\n" +
-	"avatar_url\x18\x03 \x01(\tB\x06\xe0A\x03\xe0A\x02R\tavatarUrl\"\xad\x01\n" +
+	"avatar_url\x18\x03 \x01(\tB\x03\xe0A\x02R\tavatarUrl\"\x9e\x01\n" +
 	"\n" +
-	"Attachment\x12\x18\n" +
-	"\x03url\x18\x01 \x01(\tB\x06\xe0A\x03\xe0A\x02R\x03url\x12\x1a\n" +
-	"\x04name\x18\x02 \x01(\tB\x06\xe0A\x03\xe0A\x02R\x04name\x12\x1a\n" +
-	"\x04size\x18\x03 \x01(\x03B\x06\xe0A\x03\xe0A\x02R\x04size\x12)\n" +
-	"\fcontent_type\x18\x04 \x01(\tB\x06\xe0A\x03\xe0A\x02R\vcontentType\x12\"\n" +
-	"\bchecksum\x18\x05 \x01(\tB\x06\xe0A\x03\xe0A\x02R\bchecksum\"\xcf\x04\n" +
-	"\x04Post\x12\x18\n" +
-	"\x03uid\x18\x01 \x01(\tB\x06\xe0A\x03\xe0A\x02R\x03uid\x120\n" +
-	"\x06author\x18\x02 \x01(\v2\x10.post.PostAuthorB\x06\xe0A\x03\xe0A\x02R\x06author\x12\x1a\n" +
-	"\x04text\x18\x03 \x01(\tB\x06\xe0A\x03\xe0A\x02R\x04text\x12\x1e\n" +
-	"\x06images\x18\x04 \x03(\tB\x06\xe0A\x03\xe0A\x02R\x06images\x12:\n" +
-	"\vattachments\x18\x05 \x03(\v2\x10.post.AttachmentB\x06\xe0A\x03\xe0A\x02R\vattachments\x12\x1a\n" +
-	"\x04tags\x18\x06 \x03(\tB\x06\xe0A\x03\xe0A\x02R\x04tags\x12+\n" +
-	"\rcomment_count\x18\a \x01(\x05B\x06\xe0A\x03\xe0A\x02R\fcommentCount\x121\n" +
-	"\x10collection_count\x18\b \x01(\x05B\x06\xe0A\x03\xe0A\x02R\x0fcollectionCount\x12%\n" +
+	"Attachment\x12\x15\n" +
+	"\x03url\x18\x01 \x01(\tB\x03\xe0A\x02R\x03url\x12\x17\n" +
+	"\x04name\x18\x02 \x01(\tB\x03\xe0A\x02R\x04name\x12\x17\n" +
+	"\x04size\x18\x03 \x01(\x03B\x03\xe0A\x02R\x04size\x12&\n" +
+	"\fcontent_type\x18\x04 \x01(\tB\x03\xe0A\x02R\vcontentType\x12\x1f\n" +
+	"\bchecksum\x18\x05 \x01(\tB\x03\xe0A\x02R\bchecksum\"\xe0\x04\n" +
+	"\x04Post\x12\x15\n" +
+	"\x03uid\x18\x01 \x01(\tB\x03\xe0A\x02R\x03uid\x12-\n" +
+	"\x06author\x18\x02 \x01(\v2\x10.post.PostAuthorB\x03\xe0A\x02R\x06author\x12\x17\n" +
+	"\x04text\x18\x03 \x01(\tB\x03\xe0A\x02R\x04text\x12\x1b\n" +
+	"\x06images\x18\x04 \x03(\tB\x03\xe0A\x02R\x06images\x127\n" +
+	"\vattachments\x18\x05 \x03(\v2\x10.post.AttachmentB\x03\xe0A\x02R\vattachments\x12\x17\n" +
+	"\x04tags\x18\x06 \x03(\tB\x03\xe0A\x02R\x04tags\x12(\n" +
+	"\rcomment_count\x18\a \x01(\x05B\x03\xe0A\x02R\fcommentCount\x12.\n" +
+	"\x10collection_count\x18\b \x01(\x05B\x03\xe0A\x02R\x0fcollectionCount\x12\"\n" +
 	"\n" +
-	"like_count\x18\t \x01(\x05B\x06\xe0A\x03\xe0A\x02R\tlikeCount\x12&\n" +
+	"like_count\x18\t \x01(\x05B\x03\xe0A\x02R\tlikeCount\x12#\n" +
 	"\n" +
 	"visibility\x18\n" +
-	" \x01(\tB\x06\xe0A\x03\xe0A\x02R\n" +
-	"visibility\x122\n" +
-	"\x11latest_replied_on\x18\v \x01(\x03B\x06\xe0A\x03\xe0A\x02R\x0flatestRepliedOn\x12\x16\n" +
-	"\x02ip\x18\f \x01(\tB\x06\xe0A\x03\xe0A\x02R\x02ip\x12\x1e\n" +
-	"\x06pinned\x18\r \x01(\bB\x06\xe0A\x03\xe0A\x02R\x06pinned\x12%\n" +
+	" \x01(\tB\x03\xe0A\x02R\n" +
+	"visibility\x12/\n" +
+	"\x11latest_replied_on\x18\v \x01(\x03B\x03\xe0A\x02R\x0flatestRepliedOn\x12\x13\n" +
+	"\x02ip\x18\f \x01(\tB\x03\xe0A\x02R\x02ip\x12\x1b\n" +
+	"\x06pinned\x18\r \x01(\bB\x03\xe0A\x02R\x06pinned\x12\x19\n" +
+	"\x05liked\x18\x0e \x01(\bB\x03\xe0A\x02R\x05liked\x12!\n" +
+	"\tcollected\x18\x0f \x01(\bB\x03\xe0A\x02R\tcollected\x12\"\n" +
 	"\n" +
-	"created_at\x18\x0e \x01(\x03B\x06\xe0A\x03\xe0A\x02R\tcreatedAt\x12%\n" +
+	"created_at\x18\x10 \x01(\x03B\x03\xe0A\x02R\tcreatedAt\x12\"\n" +
 	"\n" +
-	"updated_at\x18\x0f \x01(\x03B\x06\xe0A\x03\xe0A\x02R\tupdatedAt\"\xad\x01\n" +
-	"\x11CreatePostRequest\x12\x12\n" +
-	"\x04text\x18\x01 \x01(\tR\x04text\x12\x16\n" +
+	"updated_at\x18\x11 \x01(\x03B\x03\xe0A\x02R\tupdatedAt\"\xb2\x01\n" +
+	"\x11CreatePostRequest\x12\x17\n" +
+	"\x04text\x18\x01 \x01(\tB\x03\xe0A\x02R\x04text\x12\x16\n" +
 	"\x06images\x18\x02 \x03(\tR\x06images\x12 \n" +
 	"\vattachments\x18\x03 \x03(\tR\vattachments\x12\x12\n" +
 	"\x04tags\x18\x04 \x03(\tR\x04tags\x12\x1e\n" +
 	"\n" +
 	"visibility\x18\x05 \x01(\tR\n" +
 	"visibility\x12\x16\n" +
-	"\x06pinned\x18\x06 \x01(\bR\x06pinned\".\n" +
-	"\x12CreatePostResponse\x12\x18\n" +
-	"\x03uid\x18\x01 \x01(\tB\x06\xe0A\x03\xe0A\x02R\x03uid\"[\n" +
+	"\x06pinned\x18\x06 \x01(\bR\x06pinned\"+\n" +
+	"\x12CreatePostResponse\x12\x15\n" +
+	"\x03uid\x18\x01 \x01(\tB\x03\xe0A\x02R\x03uid\"[\n" +
 	"\x10ListPostsRequest\x12*\n" +
 	"\x11cursor_created_at\x18\x01 \x01(\x03R\x0fcursorCreatedAt\x12\x1b\n" +
-	"\tcursor_id\x18\x02 \x01(\tR\bcursorId\"u\n" +
-	"\x18ListPostsByAuthorRequest\x12\x10\n" +
-	"\x03uid\x18\x01 \x01(\tR\x03uid\x12*\n" +
+	"\tcursor_id\x18\x02 \x01(\tR\bcursorId\"z\n" +
+	"\x18ListPostsByAuthorRequest\x12\x15\n" +
+	"\x03uid\x18\x01 \x01(\tB\x03\xe0A\x02R\x03uid\x12*\n" +
 	"\x11cursor_created_at\x18\x02 \x01(\x03R\x0fcursorCreatedAt\x12\x1b\n" +
-	"\tcursor_id\x18\x03 \x01(\tR\bcursorId\"\xa8\x01\n" +
-	"\x11ListPostsResponse\x12(\n" +
+	"\tcursor_id\x18\x03 \x01(\tR\bcursorId\"\x9f\x01\n" +
+	"\x11ListPostsResponse\x12%\n" +
 	"\x05posts\x18\x01 \x03(\v2\n" +
-	".post.PostB\x06\xe0A\x03\xe0A\x02R\x05posts\x12;\n" +
-	"\x16next_cursor_created_at\x18\x02 \x01(\x03B\x06\xe0A\x03\xe0A\x02R\x13nextCursorCreatedAt\x12,\n" +
-	"\x0enext_cursor_id\x18\x03 \x01(\tB\x06\xe0A\x03\xe0A\x02R\fnextCursorId\"\"\n" +
-	"\x0eGetPostRequest\x12\x10\n" +
-	"\x03uid\x18\x01 \x01(\tR\x03uid\"9\n" +
-	"\x0fGetPostResponse\x12&\n" +
+	".post.PostB\x03\xe0A\x02R\x05posts\x128\n" +
+	"\x16next_cursor_created_at\x18\x02 \x01(\x03B\x03\xe0A\x02R\x13nextCursorCreatedAt\x12)\n" +
+	"\x0enext_cursor_id\x18\x03 \x01(\tB\x03\xe0A\x02R\fnextCursorId\"'\n" +
+	"\x0eGetPostRequest\x12\x15\n" +
+	"\x03uid\x18\x01 \x01(\tB\x03\xe0A\x02R\x03uid\"6\n" +
+	"\x0fGetPostResponse\x12#\n" +
 	"\x04post\x18\x01 \x01(\v2\n" +
-	".post.PostB\x06\xe0A\x03\xe0A\x02R\x04post\"\xaa\x01\n" +
+	".post.PostB\x03\xe0A\x02R\x04post\"\xaa\x01\n" +
 	"\x0eUpdatePostBody\x12\x12\n" +
 	"\x04text\x18\x01 \x01(\tR\x04text\x12\x16\n" +
 	"\x06images\x18\x02 \x03(\tR\x06images\x12 \n" +
@@ -1207,24 +1225,24 @@ const file_post_proto_rawDesc = "" +
 	"\n" +
 	"visibility\x18\x05 \x01(\tR\n" +
 	"visibility\x12\x16\n" +
-	"\x06pinned\x18\x06 \x01(\bR\x06pinned\"\x8c\x01\n" +
-	"\x11UpdatePostRequest\x12\x10\n" +
-	"\x03uid\x18\x01 \x01(\tR\x03uid\x12(\n" +
-	"\x04post\x18\x02 \x01(\v2\x14.post.UpdatePostBodyR\x04post\x12;\n" +
-	"\vupdate_mask\x18\x03 \x01(\v2\x1a.google.protobuf.FieldMaskR\n" +
-	"updateMask\"%\n" +
-	"\x11DeletePostRequest\x12\x10\n" +
-	"\x03uid\x18\x01 \x01(\tR\x03uid\"O\n" +
-	"\x0fLikePostRequest\x12\x10\n" +
-	"\x03uid\x18\x01 \x01(\tR\x03uid\x12*\n" +
+	"\x06pinned\x18\x06 \x01(\bR\x06pinned\"\x9b\x01\n" +
+	"\x11UpdatePostRequest\x12\x15\n" +
+	"\x03uid\x18\x01 \x01(\tB\x03\xe0A\x02R\x03uid\x12-\n" +
+	"\x04post\x18\x02 \x01(\v2\x14.post.UpdatePostBodyB\x03\xe0A\x02R\x04post\x12@\n" +
+	"\vupdate_mask\x18\x03 \x01(\v2\x1a.google.protobuf.FieldMaskB\x03\xe0A\x02R\n" +
+	"updateMask\"*\n" +
+	"\x11DeletePostRequest\x12\x15\n" +
+	"\x03uid\x18\x01 \x01(\tB\x03\xe0A\x02R\x03uid\"T\n" +
+	"\x0fLikePostRequest\x12\x15\n" +
+	"\x03uid\x18\x01 \x01(\tB\x03\xe0A\x02R\x03uid\x12*\n" +
+	"\x06action\x18\x02 \x01(\x0e2\x12.post.ToggleActionR\x06action\"-\n" +
+	"\x10LikePostResponse\x12\x19\n" +
+	"\x05count\x18\x01 \x01(\x05B\x03\xe0A\x02R\x05count\"W\n" +
+	"\x12CollectPostRequest\x12\x15\n" +
+	"\x03uid\x18\x01 \x01(\tB\x03\xe0A\x02R\x03uid\x12*\n" +
 	"\x06action\x18\x02 \x01(\x0e2\x12.post.ToggleActionR\x06action\"0\n" +
-	"\x10LikePostResponse\x12\x1c\n" +
-	"\x05count\x18\x01 \x01(\x05B\x06\xe0A\x03\xe0A\x02R\x05count\"R\n" +
-	"\x12CollectPostRequest\x12\x10\n" +
-	"\x03uid\x18\x01 \x01(\tR\x03uid\x12*\n" +
-	"\x06action\x18\x02 \x01(\x0e2\x12.post.ToggleActionR\x06action\"3\n" +
-	"\x13CollectPostResponse\x12\x1c\n" +
-	"\x05count\x18\x01 \x01(\x05B\x06\xe0A\x03\xe0A\x02R\x05count*?\n" +
+	"\x13CollectPostResponse\x12\x19\n" +
+	"\x05count\x18\x01 \x01(\x05B\x03\xe0A\x02R\x05count*?\n" +
 	"\fToggleAction\x12\x15\n" +
 	"\x11TOGGLE_ACTION_ADD\x10\x00\x12\x18\n" +
 	"\x14TOGGLE_ACTION_REMOVE\x10\x012\xa7\b\n" +

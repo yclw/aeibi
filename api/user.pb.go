@@ -686,52 +686,52 @@ var File_user_proto protoreflect.FileDescriptor
 const file_user_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"user.proto\x12\x04user\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a google/protobuf/field_mask.proto\"\xc9\x01\n" +
-	"\x04User\x12\x18\n" +
-	"\x03uid\x18\x01 \x01(\tB\x06\xe0A\x03\xe0A\x02R\x03uid\x12\"\n" +
-	"\busername\x18\x02 \x01(\tB\x06\xe0A\x03\xe0A\x02R\busername\x12\x1a\n" +
-	"\x04role\x18\x03 \x01(\tB\x06\xe0A\x03\xe0A\x02R\x04role\x12\x1c\n" +
-	"\x05email\x18\x04 \x01(\tB\x06\xe0A\x03\xe0A\x02R\x05email\x12\"\n" +
-	"\bnickname\x18\x05 \x01(\tB\x06\xe0A\x03\xe0A\x02R\bnickname\x12%\n" +
+	"user.proto\x12\x04user\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a google/protobuf/field_mask.proto\"\xb7\x01\n" +
+	"\x04User\x12\x15\n" +
+	"\x03uid\x18\x01 \x01(\tB\x03\xe0A\x02R\x03uid\x12\x1f\n" +
+	"\busername\x18\x02 \x01(\tB\x03\xe0A\x02R\busername\x12\x17\n" +
+	"\x04role\x18\x03 \x01(\tB\x03\xe0A\x02R\x04role\x12\x19\n" +
+	"\x05email\x18\x04 \x01(\tB\x03\xe0A\x02R\x05email\x12\x1f\n" +
+	"\bnickname\x18\x05 \x01(\tB\x03\xe0A\x02R\bnickname\x12\"\n" +
 	"\n" +
-	"avatar_url\x18\x06 \x01(\tB\x06\xe0A\x03\xe0A\x02R\tavatarUrl\"}\n" +
-	"\x11CreateUserRequest\x12\x1a\n" +
-	"\busername\x18\x01 \x01(\tR\busername\x12\x1a\n" +
-	"\bpassword\x18\x02 \x01(\tR\bpassword\x12\x14\n" +
+	"avatar_url\x18\x06 \x01(\tB\x03\xe0A\x02R\tavatarUrl\"\x87\x01\n" +
+	"\x11CreateUserRequest\x12\x1f\n" +
+	"\busername\x18\x01 \x01(\tB\x03\xe0A\x02R\busername\x12\x1f\n" +
+	"\bpassword\x18\x02 \x01(\tB\x03\xe0A\x02R\bpassword\x12\x14\n" +
 	"\x05email\x18\x03 \x01(\tR\x05email\x12\x1a\n" +
-	"\bnickname\x18\x04 \x01(\tR\bnickname\"\"\n" +
-	"\x0eGetUserRequest\x12\x10\n" +
-	"\x03uid\x18\x01 \x01(\tR\x03uid\"9\n" +
-	"\x0fGetUserResponse\x12&\n" +
+	"\bnickname\x18\x04 \x01(\tR\bnickname\"'\n" +
+	"\x0eGetUserRequest\x12\x15\n" +
+	"\x03uid\x18\x01 \x01(\tB\x03\xe0A\x02R\x03uid\"6\n" +
+	"\x0fGetUserResponse\x12#\n" +
 	"\x04user\x18\x01 \x01(\v2\n" +
-	".user.UserB\x06\xe0A\x03\xe0A\x02R\x04user\"7\n" +
-	"\rGetMeResponse\x12&\n" +
+	".user.UserB\x03\xe0A\x02R\x04user\"4\n" +
+	"\rGetMeResponse\x12#\n" +
 	"\x04user\x18\x01 \x01(\v2\n" +
-	".user.UserB\x06\xe0A\x03\xe0A\x02R\x04user\"{\n" +
+	".user.UserB\x03\xe0A\x02R\x04user\"{\n" +
 	"\fUpdateMeUser\x12\x1a\n" +
 	"\busername\x18\x01 \x01(\tR\busername\x12\x14\n" +
 	"\x05email\x18\x02 \x01(\tR\x05email\x12\x1a\n" +
 	"\bnickname\x18\x03 \x01(\tR\bnickname\x12\x1d\n" +
 	"\n" +
-	"avatar_url\x18\x04 \x01(\tR\tavatarUrl\"v\n" +
-	"\x0fUpdateMeRequest\x12&\n" +
-	"\x04user\x18\x01 \x01(\v2\x12.user.UpdateMeUserR\x04user\x12;\n" +
-	"\vupdate_mask\x18\x02 \x01(\v2\x1a.google.protobuf.FieldMaskR\n" +
-	"updateMask\"{\n" +
-	"\fLoginRequest\x12\x18\n" +
-	"\aaccount\x18\x01 \x01(\tR\aaccount\x12\x1a\n" +
-	"\bpassword\x18\x02 \x01(\tR\bpassword\x12\x18\n" +
+	"avatar_url\x18\x04 \x01(\tR\tavatarUrl\"\x80\x01\n" +
+	"\x0fUpdateMeRequest\x12+\n" +
+	"\x04user\x18\x01 \x01(\v2\x12.user.UpdateMeUserB\x03\xe0A\x02R\x04user\x12@\n" +
+	"\vupdate_mask\x18\x02 \x01(\v2\x1a.google.protobuf.FieldMaskB\x03\xe0A\x02R\n" +
+	"updateMask\"\x85\x01\n" +
+	"\fLoginRequest\x12\x1d\n" +
+	"\aaccount\x18\x01 \x01(\tB\x03\xe0A\x02R\aaccount\x12\x1f\n" +
+	"\bpassword\x18\x02 \x01(\tB\x03\xe0A\x02R\bpassword\x12\x18\n" +
 	"\acaptcha\x18\x03 \x01(\tR\acaptcha\x12\x1b\n" +
-	"\tdevice_id\x18\x04 \x01(\tR\bdeviceId\"@\n" +
-	"\rLoginResponse\x12/\n" +
-	"\x06tokens\x18\x01 \x01(\v2\x0f.user.TokenPairB\x06\xe0A\x03\xe0A\x02R\x06tokens\":\n" +
-	"\x13RefreshTokenRequest\x12#\n" +
-	"\rrefresh_token\x18\x01 \x01(\tR\frefreshToken\"G\n" +
-	"\x14RefreshTokenResponse\x12/\n" +
-	"\x06tokens\x18\x01 \x01(\v2\x0f.user.TokenPairB\x06\xe0A\x03\xe0A\x02R\x06tokens\"c\n" +
-	"\tTokenPair\x12)\n" +
-	"\faccess_token\x18\x01 \x01(\tB\x06\xe0A\x03\xe0A\x02R\vaccessToken\x12+\n" +
-	"\rrefresh_token\x18\x02 \x01(\tB\x06\xe0A\x03\xe0A\x02R\frefreshToken2\x93\x04\n" +
+	"\tdevice_id\x18\x04 \x01(\tR\bdeviceId\"=\n" +
+	"\rLoginResponse\x12,\n" +
+	"\x06tokens\x18\x01 \x01(\v2\x0f.user.TokenPairB\x03\xe0A\x02R\x06tokens\"?\n" +
+	"\x13RefreshTokenRequest\x12(\n" +
+	"\rrefresh_token\x18\x01 \x01(\tB\x03\xe0A\x02R\frefreshToken\"D\n" +
+	"\x14RefreshTokenResponse\x12,\n" +
+	"\x06tokens\x18\x01 \x01(\v2\x0f.user.TokenPairB\x03\xe0A\x02R\x06tokens\"]\n" +
+	"\tTokenPair\x12&\n" +
+	"\faccess_token\x18\x01 \x01(\tB\x03\xe0A\x02R\vaccessToken\x12(\n" +
+	"\rrefresh_token\x18\x02 \x01(\tB\x03\xe0A\x02R\frefreshToken2\x93\x04\n" +
 	"\vUserService\x12W\n" +
 	"\n" +
 	"CreateUser\x12\x17.user.CreateUserRequest\x1a\x16.google.protobuf.Empty\"\x18\x82\xd3\xe4\x93\x02\x12:\x01*\"\r/api/v1/users\x12S\n" +

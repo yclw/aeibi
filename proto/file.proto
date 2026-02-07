@@ -36,35 +36,35 @@ service FileService {
 // -------------------- Messages --------------------
 
 message File {
-  string name         = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
-  string content_type = 2 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
-  int64  size         = 3 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
-  string checksum     = 4 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
-  string uploader     = 5 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
-  int64  created_at   = 6 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  string name         = 1 [(google.api.field_behavior) = REQUIRED];
+  string content_type = 2 [(google.api.field_behavior) = REQUIRED];
+  int64  size         = 3 [(google.api.field_behavior) = REQUIRED];
+  string checksum     = 4 [(google.api.field_behavior) = REQUIRED];
+  string uploader     = 5 [(google.api.field_behavior) = REQUIRED];
+  int64  created_at   = 6 [(google.api.field_behavior) = REQUIRED];
 }
 
 message UploadFileRequest {
   string name         = 1;
   string content_type = 2;
-  bytes  data         = 3;
+  bytes  data         = 3 [(google.api.field_behavior) = REQUIRED];
   string checksum     = 4;
 }
 
 message UploadFileResponse {
-  File  file = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
-  string url  = 2 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  File  file = 1 [(google.api.field_behavior) = REQUIRED];
+  string url  = 2 [(google.api.field_behavior) = REQUIRED];
 }
 
 message GetFileMetaRequest {
-  string url = 1;
+  string url = 1 [(google.api.field_behavior) = REQUIRED];
 }
 
 message GetFileMetaResponse {
-  File  file = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
-  string url  = 2 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  File  file = 1 [(google.api.field_behavior) = REQUIRED];
+  string url  = 2 [(google.api.field_behavior) = REQUIRED];
 }
 
 message GetFileRequest {
-  string url = 1;
+  string url = 1 [(google.api.field_behavior) = REQUIRED];
 }

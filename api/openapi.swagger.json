@@ -751,30 +751,24 @@
       "type": "object",
       "properties": {
         "name": {
-          "type": "string",
-          "readOnly": true
+          "type": "string"
         },
         "contentType": {
-          "type": "string",
-          "readOnly": true
+          "type": "string"
         },
         "size": {
           "type": "string",
-          "format": "int64",
-          "readOnly": true
+          "format": "int64"
         },
         "checksum": {
-          "type": "string",
-          "readOnly": true
+          "type": "string"
         },
         "uploader": {
-          "type": "string",
-          "readOnly": true
+          "type": "string"
         },
         "createdAt": {
           "type": "string",
-          "format": "int64",
-          "readOnly": true
+          "format": "int64"
         }
       },
       "required": [
@@ -790,12 +784,10 @@
       "type": "object",
       "properties": {
         "file": {
-          "$ref": "#/definitions/fileFile",
-          "readOnly": true
+          "$ref": "#/definitions/fileFile"
         },
         "url": {
-          "type": "string",
-          "readOnly": true
+          "type": "string"
         }
       },
       "required": [
@@ -819,18 +811,19 @@
         "checksum": {
           "type": "string"
         }
-      }
+      },
+      "required": [
+        "data"
+      ]
     },
     "fileUploadFileResponse": {
       "type": "object",
       "properties": {
         "file": {
-          "$ref": "#/definitions/fileFile",
-          "readOnly": true
+          "$ref": "#/definitions/fileFile"
         },
         "url": {
-          "type": "string",
-          "readOnly": true
+          "type": "string"
         }
       },
       "required": [
@@ -842,25 +835,20 @@
       "type": "object",
       "properties": {
         "url": {
-          "type": "string",
-          "readOnly": true
+          "type": "string"
         },
         "name": {
-          "type": "string",
-          "readOnly": true
+          "type": "string"
         },
         "size": {
           "type": "string",
-          "format": "int64",
-          "readOnly": true
+          "format": "int64"
         },
         "contentType": {
-          "type": "string",
-          "readOnly": true
+          "type": "string"
         },
         "checksum": {
-          "type": "string",
-          "readOnly": true
+          "type": "string"
         }
       },
       "required": [
@@ -876,8 +864,7 @@
       "properties": {
         "count": {
           "type": "integer",
-          "format": "int32",
-          "readOnly": true
+          "format": "int32"
         }
       },
       "required": [
@@ -914,14 +901,16 @@
         "pinned": {
           "type": "boolean"
         }
-      }
+      },
+      "required": [
+        "text"
+      ]
     },
     "postCreatePostResponse": {
       "type": "object",
       "properties": {
         "uid": {
-          "type": "string",
-          "readOnly": true
+          "type": "string"
         }
       },
       "required": [
@@ -932,8 +921,7 @@
       "type": "object",
       "properties": {
         "post": {
-          "$ref": "#/definitions/postPost",
-          "readOnly": true
+          "$ref": "#/definitions/postPost"
         }
       },
       "required": [
@@ -945,8 +933,7 @@
       "properties": {
         "count": {
           "type": "integer",
-          "format": "int32",
-          "readOnly": true
+          "format": "int32"
         }
       },
       "required": [
@@ -961,17 +948,14 @@
           "items": {
             "type": "object",
             "$ref": "#/definitions/postPost"
-          },
-          "readOnly": true
+          }
         },
         "nextCursorCreatedAt": {
           "type": "string",
-          "format": "int64",
-          "readOnly": true
+          "format": "int64"
         },
         "nextCursorId": {
-          "type": "string",
-          "readOnly": true
+          "type": "string"
         }
       },
       "required": [
@@ -984,80 +968,71 @@
       "type": "object",
       "properties": {
         "uid": {
-          "type": "string",
-          "readOnly": true
+          "type": "string"
         },
         "author": {
-          "$ref": "#/definitions/postPostAuthor",
-          "readOnly": true
+          "$ref": "#/definitions/postPostAuthor"
         },
         "text": {
-          "type": "string",
-          "readOnly": true
+          "type": "string"
         },
         "images": {
           "type": "array",
           "items": {
             "type": "string"
-          },
-          "readOnly": true
+          }
         },
         "attachments": {
           "type": "array",
           "items": {
             "type": "object",
             "$ref": "#/definitions/postAttachment"
-          },
-          "readOnly": true
+          }
         },
         "tags": {
           "type": "array",
           "items": {
             "type": "string"
-          },
-          "readOnly": true
+          }
         },
         "commentCount": {
           "type": "integer",
-          "format": "int32",
-          "readOnly": true
+          "format": "int32"
         },
         "collectionCount": {
           "type": "integer",
-          "format": "int32",
-          "readOnly": true
+          "format": "int32"
         },
         "likeCount": {
           "type": "integer",
-          "format": "int32",
-          "readOnly": true
+          "format": "int32"
         },
         "visibility": {
-          "type": "string",
-          "readOnly": true
+          "type": "string"
         },
         "latestRepliedOn": {
           "type": "string",
-          "format": "int64",
-          "readOnly": true
+          "format": "int64"
         },
         "ip": {
-          "type": "string",
-          "readOnly": true
+          "type": "string"
         },
         "pinned": {
-          "type": "boolean",
-          "readOnly": true
+          "type": "boolean"
+        },
+        "liked": {
+          "type": "boolean"
+        },
+        "collected": {
+          "type": "boolean"
         },
         "createdAt": {
           "type": "string",
-          "format": "int64",
-          "readOnly": true
+          "format": "int64"
         },
         "updatedAt": {
           "type": "string",
-          "format": "int64",
-          "readOnly": true
+          "format": "int64"
         }
       },
       "required": [
@@ -1074,6 +1049,8 @@
         "latestRepliedOn",
         "ip",
         "pinned",
+        "liked",
+        "collected",
         "createdAt",
         "updatedAt"
       ]
@@ -1082,16 +1059,13 @@
       "type": "object",
       "properties": {
         "uid": {
-          "type": "string",
-          "readOnly": true
+          "type": "string"
         },
         "nickname": {
-          "type": "string",
-          "readOnly": true
+          "type": "string"
         },
         "avatarUrl": {
-          "type": "string",
-          "readOnly": true
+          "type": "string"
         }
       },
       "required": [
@@ -1185,14 +1159,17 @@
         "nickname": {
           "type": "string"
         }
-      }
+      },
+      "required": [
+        "username",
+        "password"
+      ]
     },
     "userGetMeResponse": {
       "type": "object",
       "properties": {
         "user": {
-          "$ref": "#/definitions/userUser",
-          "readOnly": true
+          "$ref": "#/definitions/userUser"
         }
       },
       "required": [
@@ -1203,8 +1180,7 @@
       "type": "object",
       "properties": {
         "user": {
-          "$ref": "#/definitions/userUser",
-          "readOnly": true
+          "$ref": "#/definitions/userUser"
         }
       },
       "required": [
@@ -1227,14 +1203,17 @@
         "deviceId": {
           "type": "string"
         }
-      }
+      },
+      "required": [
+        "account",
+        "password"
+      ]
     },
     "userLoginResponse": {
       "type": "object",
       "properties": {
         "tokens": {
-          "$ref": "#/definitions/userTokenPair",
-          "readOnly": true
+          "$ref": "#/definitions/userTokenPair"
         }
       },
       "required": [
@@ -1247,14 +1226,16 @@
         "refreshToken": {
           "type": "string"
         }
-      }
+      },
+      "required": [
+        "refreshToken"
+      ]
     },
     "userRefreshTokenResponse": {
       "type": "object",
       "properties": {
         "tokens": {
-          "$ref": "#/definitions/userTokenPair",
-          "readOnly": true
+          "$ref": "#/definitions/userTokenPair"
         }
       },
       "required": [
@@ -1265,12 +1246,10 @@
       "type": "object",
       "properties": {
         "accessToken": {
-          "type": "string",
-          "readOnly": true
+          "type": "string"
         },
         "refreshToken": {
-          "type": "string",
-          "readOnly": true
+          "type": "string"
         }
       },
       "title": "Tokens",
@@ -1300,28 +1279,22 @@
       "type": "object",
       "properties": {
         "uid": {
-          "type": "string",
-          "readOnly": true
+          "type": "string"
         },
         "username": {
-          "type": "string",
-          "readOnly": true
+          "type": "string"
         },
         "role": {
-          "type": "string",
-          "readOnly": true
+          "type": "string"
         },
         "email": {
-          "type": "string",
-          "readOnly": true
+          "type": "string"
         },
         "nickname": {
-          "type": "string",
-          "readOnly": true
+          "type": "string"
         },
         "avatarUrl": {
-          "type": "string",
-          "readOnly": true
+          "type": "string"
         }
       },
       "required": [

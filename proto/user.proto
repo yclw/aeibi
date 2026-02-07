@@ -61,19 +61,19 @@ service UserService {
 // -------------------- Messages --------------------
 
 message User {
-  string uid        = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
-  string username   = 2 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
-  string role       = 3 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
-  string email      = 4 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
-  string nickname   = 5 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
-  string avatar_url = 6 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  string uid        = 1 [(google.api.field_behavior) = REQUIRED];
+  string username   = 2 [(google.api.field_behavior) = REQUIRED];
+  string role       = 3 [(google.api.field_behavior) = REQUIRED];
+  string email      = 4 [(google.api.field_behavior) = REQUIRED];
+  string nickname   = 5 [(google.api.field_behavior) = REQUIRED];
+  string avatar_url = 6 [(google.api.field_behavior) = REQUIRED];
 }
 
 // Create
 
 message CreateUserRequest {
-  string username = 1;
-  string password = 2;
+  string username = 1 [(google.api.field_behavior) = REQUIRED];
+  string password = 2 [(google.api.field_behavior) = REQUIRED];
   string email    = 3;
   string nickname = 4;
 }
@@ -81,17 +81,17 @@ message CreateUserRequest {
 // Get
 
 message GetUserRequest {
-  string uid = 1;
+  string uid = 1 [(google.api.field_behavior) = REQUIRED];
 }
 
 message GetUserResponse {
-  User user = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  User user = 1 [(google.api.field_behavior) = REQUIRED];
 }
 
 // Me
 
 message GetMeResponse {
-  User user = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  User user = 1 [(google.api.field_behavior) = REQUIRED];
 }
 
 message UpdateMeUser {
@@ -102,33 +102,33 @@ message UpdateMeUser {
 }
 
 message UpdateMeRequest {
-  UpdateMeUser               user        = 1;
-  google.protobuf.FieldMask  update_mask = 2;
+  UpdateMeUser               user        = 1 [(google.api.field_behavior) = REQUIRED];
+  google.protobuf.FieldMask  update_mask = 2 [(google.api.field_behavior) = REQUIRED];
 }
 
 // Auth
 
 message LoginRequest {
-  string account   = 1; // username/email/phone
-  string password  = 2;
+  string account   = 1 [(google.api.field_behavior) = REQUIRED]; // username/email/phone
+  string password  = 2 [(google.api.field_behavior) = REQUIRED];
   string captcha   = 3;
   string device_id = 4;
 }
 
 message LoginResponse {
-  TokenPair tokens = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  TokenPair tokens = 1 [(google.api.field_behavior) = REQUIRED];
 }
 
 message RefreshTokenRequest {
-  string refresh_token = 1;
+  string refresh_token = 1 [(google.api.field_behavior) = REQUIRED];
 }
 
 message RefreshTokenResponse {
-  TokenPair tokens = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  TokenPair tokens = 1 [(google.api.field_behavior) = REQUIRED];
 }
 
 // Tokens
 message TokenPair {
-  string access_token  = 1 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
-  string refresh_token = 2 [(google.api.field_behavior) = OUTPUT_ONLY, (google.api.field_behavior) = REQUIRED];
+  string access_token  = 1 [(google.api.field_behavior) = REQUIRED];
+  string refresh_token = 2 [(google.api.field_behavior) = REQUIRED];
 }

@@ -265,6 +265,12 @@ func (ns NullUserStatus) Value() (driver.Value, error) {
 	return string(ns.UserStatus), nil
 }
 
+type CommentLike struct {
+	CommentUid uuid.UUID
+	UserUid    uuid.UUID
+	CreatedAt  time.Time
+}
+
 type File struct {
 	ID          int32
 	Url         string
@@ -313,6 +319,7 @@ type PostComment struct {
 	Content          string
 	Images           []string
 	ReplyCount       int32
+	LikeCount        int32
 	Ip               string
 	Status           CommentStatus
 	CreatedAt        time.Time

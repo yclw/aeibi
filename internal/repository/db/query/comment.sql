@@ -38,6 +38,51 @@ FROM post_comments
 WHERE uid = @uid
   AND status = 'NORMAL'::comment_status
 LIMIT 1;
+-- name: AddCommentLike :one
+WITH inserted AS (
+  INSERT INTO comment_likes (comment_uid, user_uid)
+  VALUES (@comment_uid, @user_uid) ON CONFLICT DO NOTHING
+  RETURNING 1
+),
+updated AS (
+  UPDATE post_comments
+  SET like_count = like_count + 1,
+    updated_at = now()
+  WHERE uid = @comment_uid
+    AND EXISTS (SELECT 1 FROM inserted)
+  RETURNING like_count
+)
+SELECT like_count
+FROM updated
+UNION ALL
+SELECT like_count
+FROM post_comments
+WHERE uid = @comment_uid
+  AND NOT EXISTS (SELECT 1 FROM updated)
+LIMIT 1;
+-- name: RemoveCommentLike :one
+WITH deleted AS (
+  DELETE FROM comment_likes
+  WHERE comment_uid = @comment_uid
+    AND user_uid = @user_uid
+  RETURNING 1
+),
+updated AS (
+  UPDATE post_comments
+  SET like_count = GREATEST(like_count - 1, 0),
+    updated_at = now()
+  WHERE uid = @comment_uid
+    AND EXISTS (SELECT 1 FROM deleted)
+  RETURNING like_count
+)
+SELECT like_count
+FROM updated
+UNION ALL
+SELECT like_count
+FROM post_comments
+WHERE uid = @comment_uid
+  AND NOT EXISTS (SELECT 1 FROM updated)
+LIMIT 1;
 -- name: ListTopComments :many
 SELECT c.uid,
   u.uid AS author_uid,
@@ -50,11 +95,15 @@ SELECT c.uid,
   c.content,
   c.images,
   c.reply_count,
+  c.like_count,
+  (cl.user_uid IS NOT NULL)::boolean AS liked,
   c.created_at,
   c.updated_at
 FROM post_comments c
   JOIN users u ON u.uid = c.author_uid
   AND u.status = 'NORMAL'::user_status
+  LEFT JOIN comment_likes cl ON cl.comment_uid = c.uid
+  AND cl.user_uid = sqlc.narg(viewer)::uuid
 WHERE c.status = 'NORMAL'::comment_status
   AND c.post_uid = @post_uid
   AND c.parent_uid IS NULL
@@ -83,12 +132,16 @@ SELECT c.uid,
   c.content,
   c.images,
   c.reply_count,
+  c.like_count,
+  (cl.user_uid IS NOT NULL)::boolean AS liked,
   c.created_at,
   c.updated_at,
   COUNT(*) OVER ()::int AS total
 FROM post_comments c
   JOIN users u ON u.uid = c.author_uid
   AND u.status = 'NORMAL'::user_status
+  LEFT JOIN comment_likes cl ON cl.comment_uid = c.uid
+  AND cl.user_uid = sqlc.narg(viewer)::uuid
 WHERE c.status = 'NORMAL'::comment_status
   AND c.root_uid = @root_uid
   AND c.root_uid <> c.uid

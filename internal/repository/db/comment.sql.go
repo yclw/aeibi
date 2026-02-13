@@ -14,6 +14,42 @@ import (
 	"github.com/lib/pq"
 )
 
+const addCommentLike = `-- name: AddCommentLike :one
+WITH inserted AS (
+  INSERT INTO comment_likes (comment_uid, user_uid)
+  VALUES ($1, $2) ON CONFLICT DO NOTHING
+  RETURNING 1
+),
+updated AS (
+  UPDATE post_comments
+  SET like_count = like_count + 1,
+    updated_at = now()
+  WHERE uid = $1
+    AND EXISTS (SELECT 1 FROM inserted)
+  RETURNING like_count
+)
+SELECT like_count
+FROM updated
+UNION ALL
+SELECT like_count
+FROM post_comments
+WHERE uid = $1
+  AND NOT EXISTS (SELECT 1 FROM updated)
+LIMIT 1
+`
+
+type AddCommentLikeParams struct {
+	CommentUid uuid.UUID
+	UserUid    uuid.UUID
+}
+
+func (q *Queries) AddCommentLike(ctx context.Context, arg AddCommentLikeParams) (int32, error) {
+	row := q.db.QueryRowContext(ctx, addCommentLike, arg.CommentUid, arg.UserUid)
+	var like_count int32
+	err := row.Scan(&like_count)
+	return like_count, err
+}
+
 const archiveCommentByUidAndAuthor = `-- name: ArchiveCommentByUidAndAuthor :execrows
 UPDATE post_comments
 SET status = 'ARCHIVED'::comment_status,
@@ -197,21 +233,26 @@ SELECT c.uid,
   c.content,
   c.images,
   c.reply_count,
+  c.like_count,
+  (cl.user_uid IS NOT NULL)::boolean AS liked,
   c.created_at,
   c.updated_at,
   COUNT(*) OVER ()::int AS total
 FROM post_comments c
   JOIN users u ON u.uid = c.author_uid
   AND u.status = 'NORMAL'::user_status
+  LEFT JOIN comment_likes cl ON cl.comment_uid = c.uid
+  AND cl.user_uid = $1::uuid
 WHERE c.status = 'NORMAL'::comment_status
-  AND c.root_uid = $1
+  AND c.root_uid = $2
   AND c.root_uid <> c.uid
 ORDER BY c.created_at ASC,
   c.uid ASC
-LIMIT 10 OFFSET ($2::int - 1) * 10
+LIMIT 10 OFFSET ($3::int - 1) * 10
 `
 
 type ListRepliesParams struct {
+	Viewer  uuid.NullUUID
 	RootUid uuid.UUID
 	Page    int32
 }
@@ -228,13 +269,15 @@ type ListRepliesRow struct {
 	Content          string
 	Images           []string
 	ReplyCount       int32
+	LikeCount        int32
+	Liked            bool
 	CreatedAt        time.Time
 	UpdatedAt        time.Time
 	Total            int32
 }
 
 func (q *Queries) ListReplies(ctx context.Context, arg ListRepliesParams) ([]ListRepliesRow, error) {
-	rows, err := q.db.QueryContext(ctx, listReplies, arg.RootUid, arg.Page)
+	rows, err := q.db.QueryContext(ctx, listReplies, arg.Viewer, arg.RootUid, arg.Page)
 	if err != nil {
 		return nil, err
 	}
@@ -254,6 +297,8 @@ func (q *Queries) ListReplies(ctx context.Context, arg ListRepliesParams) ([]Lis
 			&i.Content,
 			pq.Array(&i.Images),
 			&i.ReplyCount,
+			&i.LikeCount,
+			&i.Liked,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.Total,
@@ -283,22 +328,26 @@ SELECT c.uid,
   c.content,
   c.images,
   c.reply_count,
+  c.like_count,
+  (cl.user_uid IS NOT NULL)::boolean AS liked,
   c.created_at,
   c.updated_at
 FROM post_comments c
   JOIN users u ON u.uid = c.author_uid
   AND u.status = 'NORMAL'::user_status
+  LEFT JOIN comment_likes cl ON cl.comment_uid = c.uid
+  AND cl.user_uid = $1::uuid
 WHERE c.status = 'NORMAL'::comment_status
-  AND c.post_uid = $1
+  AND c.post_uid = $2
   AND c.parent_uid IS NULL
   AND (
     (
-      $2::timestamptz IS NULL
-      AND $3::uuid IS NULL
+      $3::timestamptz IS NULL
+      AND $4::uuid IS NULL
     )
     OR (c.created_at, c.uid) < (
-      $2::timestamptz,
-      $3::uuid
+      $3::timestamptz,
+      $4::uuid
     )
   )
 ORDER BY c.created_at DESC,
@@ -307,6 +356,7 @@ LIMIT 20
 `
 
 type ListTopCommentsParams struct {
+	Viewer          uuid.NullUUID
 	PostUid         uuid.UUID
 	CursorCreatedAt sql.NullTime
 	CursorID        uuid.NullUUID
@@ -324,12 +374,19 @@ type ListTopCommentsRow struct {
 	Content          string
 	Images           []string
 	ReplyCount       int32
+	LikeCount        int32
+	Liked            bool
 	CreatedAt        time.Time
 	UpdatedAt        time.Time
 }
 
 func (q *Queries) ListTopComments(ctx context.Context, arg ListTopCommentsParams) ([]ListTopCommentsRow, error) {
-	rows, err := q.db.QueryContext(ctx, listTopComments, arg.PostUid, arg.CursorCreatedAt, arg.CursorID)
+	rows, err := q.db.QueryContext(ctx, listTopComments,
+		arg.Viewer,
+		arg.PostUid,
+		arg.CursorCreatedAt,
+		arg.CursorID,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -349,6 +406,8 @@ func (q *Queries) ListTopComments(ctx context.Context, arg ListTopCommentsParams
 			&i.Content,
 			pq.Array(&i.Images),
 			&i.ReplyCount,
+			&i.LikeCount,
+			&i.Liked,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -363,4 +422,41 @@ func (q *Queries) ListTopComments(ctx context.Context, arg ListTopCommentsParams
 		return nil, err
 	}
 	return items, nil
+}
+
+const removeCommentLike = `-- name: RemoveCommentLike :one
+WITH deleted AS (
+  DELETE FROM comment_likes
+  WHERE comment_uid = $1
+    AND user_uid = $2
+  RETURNING 1
+),
+updated AS (
+  UPDATE post_comments
+  SET like_count = GREATEST(like_count - 1, 0),
+    updated_at = now()
+  WHERE uid = $1
+    AND EXISTS (SELECT 1 FROM deleted)
+  RETURNING like_count
+)
+SELECT like_count
+FROM updated
+UNION ALL
+SELECT like_count
+FROM post_comments
+WHERE uid = $1
+  AND NOT EXISTS (SELECT 1 FROM updated)
+LIMIT 1
+`
+
+type RemoveCommentLikeParams struct {
+	CommentUid uuid.UUID
+	UserUid    uuid.UUID
+}
+
+func (q *Queries) RemoveCommentLike(ctx context.Context, arg RemoveCommentLikeParams) (int32, error) {
+	row := q.db.QueryRowContext(ctx, removeCommentLike, arg.CommentUid, arg.UserUid)
+	var like_count int32
+	err := row.Scan(&like_count)
+	return like_count, err
 }

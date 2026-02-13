@@ -46,6 +46,14 @@ service CommentService {
       delete: "/api/v1/comments/{uid}"
     };
   }
+
+  // POST /api/v1/comments/{uid}/like 点赞或取消赞
+  rpc LikeComment(LikeCommentRequest) returns (LikeCommentResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/comments/{uid}/like"
+      body: "*"
+    };
+  }
 }
 
 // -------------------- Messages --------------------
@@ -68,6 +76,13 @@ message Comment {
   int32           reply_count         = 9 [(google.api.field_behavior) = REQUIRED];
   int64           created_at          = 10 [(google.api.field_behavior) = REQUIRED];
   int64           updated_at          = 11 [(google.api.field_behavior) = REQUIRED];
+  int32           like_count          = 12 [(google.api.field_behavior) = REQUIRED];
+  bool            liked               = 13 [(google.api.field_behavior) = REQUIRED];
+}
+
+enum CommentToggleAction {
+  COMMENT_TOGGLE_ACTION_ADD    = 0;
+  COMMENT_TOGGLE_ACTION_REMOVE = 1;
 }
 
 // Create
@@ -122,4 +137,15 @@ message ListRepliesResponse {
 
 message DeleteCommentRequest {
   string uid = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+// Like
+
+message LikeCommentRequest {
+  string              uid    = 1 [(google.api.field_behavior) = REQUIRED];
+  CommentToggleAction action = 2;
+}
+
+message LikeCommentResponse {
+  int32 count = 1 [(google.api.field_behavior) = REQUIRED];
 }

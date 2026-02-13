@@ -25,6 +25,7 @@ const (
 	CommentService_ListTopComments_FullMethodName  = "/comment.CommentService/ListTopComments"
 	CommentService_ListReplies_FullMethodName      = "/comment.CommentService/ListReplies"
 	CommentService_DeleteComment_FullMethodName    = "/comment.CommentService/DeleteComment"
+	CommentService_LikeComment_FullMethodName      = "/comment.CommentService/LikeComment"
 )
 
 // CommentServiceClient is the client API for CommentService service.
@@ -43,6 +44,8 @@ type CommentServiceClient interface {
 	ListReplies(ctx context.Context, in *ListRepliesRequest, opts ...grpc.CallOption) (*ListRepliesResponse, error)
 	// DELETE /api/v1/comments/{uid} 软删评论
 	DeleteComment(ctx context.Context, in *DeleteCommentRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// POST /api/v1/comments/{uid}/like 点赞或取消赞
+	LikeComment(ctx context.Context, in *LikeCommentRequest, opts ...grpc.CallOption) (*LikeCommentResponse, error)
 }
 
 type commentServiceClient struct {
@@ -103,6 +106,16 @@ func (c *commentServiceClient) DeleteComment(ctx context.Context, in *DeleteComm
 	return out, nil
 }
 
+func (c *commentServiceClient) LikeComment(ctx context.Context, in *LikeCommentRequest, opts ...grpc.CallOption) (*LikeCommentResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(LikeCommentResponse)
+	err := c.cc.Invoke(ctx, CommentService_LikeComment_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CommentServiceServer is the server API for CommentService service.
 // All implementations must embed UnimplementedCommentServiceServer
 // for forward compatibility.
@@ -119,6 +132,8 @@ type CommentServiceServer interface {
 	ListReplies(context.Context, *ListRepliesRequest) (*ListRepliesResponse, error)
 	// DELETE /api/v1/comments/{uid} 软删评论
 	DeleteComment(context.Context, *DeleteCommentRequest) (*emptypb.Empty, error)
+	// POST /api/v1/comments/{uid}/like 点赞或取消赞
+	LikeComment(context.Context, *LikeCommentRequest) (*LikeCommentResponse, error)
 	mustEmbedUnimplementedCommentServiceServer()
 }
 
@@ -143,6 +158,9 @@ func (UnimplementedCommentServiceServer) ListReplies(context.Context, *ListRepli
 }
 func (UnimplementedCommentServiceServer) DeleteComment(context.Context, *DeleteCommentRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteComment not implemented")
+}
+func (UnimplementedCommentServiceServer) LikeComment(context.Context, *LikeCommentRequest) (*LikeCommentResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method LikeComment not implemented")
 }
 func (UnimplementedCommentServiceServer) mustEmbedUnimplementedCommentServiceServer() {}
 func (UnimplementedCommentServiceServer) testEmbeddedByValue()                        {}
@@ -255,6 +273,24 @@ func _CommentService_DeleteComment_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CommentService_LikeComment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LikeCommentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CommentServiceServer).LikeComment(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CommentService_LikeComment_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CommentServiceServer).LikeComment(ctx, req.(*LikeCommentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CommentService_ServiceDesc is the grpc.ServiceDesc for CommentService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -281,6 +317,10 @@ var CommentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteComment",
 			Handler:    _CommentService_DeleteComment_Handler,
+		},
+		{
+			MethodName: "LikeComment",
+			Handler:    _CommentService_LikeComment_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -11,6 +11,7 @@ CREATE TABLE post_comments (
   content text NOT NULL,
   images text [] NOT NULL DEFAULT ARRAY []::text [],
   reply_count integer NOT NULL DEFAULT 0,
+  like_count integer NOT NULL DEFAULT 0,
   ip text NOT NULL DEFAULT '',
   status comment_status NOT NULL DEFAULT 'NORMAL',
   created_at timestamptz NOT NULL DEFAULT now(),
@@ -22,3 +23,12 @@ WHERE status = 'NORMAL'::comment_status
 CREATE INDEX idx_post_comments_root_page_normal ON post_comments (root_uid, created_at ASC, uid ASC)
 WHERE status = 'NORMAL'::comment_status
   AND root_uid <> uid;
+-- comment_likes table
+CREATE TABLE comment_likes (
+  comment_uid uuid NOT NULL REFERENCES post_comments(uid) ON DELETE CASCADE,
+  user_uid uuid NOT NULL REFERENCES users(uid) ON DELETE CASCADE,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (comment_uid, user_uid)
+);
+CREATE INDEX idx_comment_likes_user_uid ON comment_likes (user_uid);
+CREATE INDEX idx_comment_likes_comment_uid_created_at ON comment_likes (comment_uid, created_at DESC);

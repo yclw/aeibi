@@ -165,6 +165,45 @@
         ]
       }
     },
+    "/api/v1/comments/{uid}/like": {
+      "post": {
+        "summary": "POST /api/v1/comments/{uid}/like 点赞或取消赞",
+        "operationId": "CommentService_LikeComment",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/commentLikeCommentResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CommentServiceLikeCommentBody"
+            }
+          }
+        ],
+        "tags": [
+          "CommentService"
+        ]
+      }
+    },
     "/api/v1/comments/{uid}/replies": {
       "get": {
         "summary": "GET /api/v1/comments/{uid}/replies 回复列表",
@@ -1052,6 +1091,14 @@
         "content"
       ]
     },
+    "CommentServiceLikeCommentBody": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "$ref": "#/definitions/commentCommentToggleAction"
+        }
+      }
+    },
     "FollowServiceFollowBody": {
       "type": "object",
       "properties": {
@@ -1140,6 +1187,13 @@
         "updatedAt": {
           "type": "string",
           "format": "int64"
+        },
+        "likeCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "liked": {
+          "type": "boolean"
         }
       },
       "required": [
@@ -1151,7 +1205,9 @@
         "images",
         "replyCount",
         "createdAt",
-        "updatedAt"
+        "updatedAt",
+        "likeCount",
+        "liked"
       ]
     },
     "commentCommentAuthor": {
@@ -1172,6 +1228,14 @@
         "nickname",
         "avatarUrl"
       ]
+    },
+    "commentCommentToggleAction": {
+      "type": "string",
+      "enum": [
+        "COMMENT_TOGGLE_ACTION_ADD",
+        "COMMENT_TOGGLE_ACTION_REMOVE"
+      ],
+      "default": "COMMENT_TOGGLE_ACTION_ADD"
     },
     "commentCreateReplyResponse": {
       "type": "object",
@@ -1203,6 +1267,18 @@
       "required": [
         "uid",
         "commentCount"
+      ]
+    },
+    "commentLikeCommentResponse": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "required": [
+        "count"
       ]
     },
     "commentListRepliesResponse": {

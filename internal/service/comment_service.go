@@ -87,6 +87,7 @@ func (s *CommentService) CreateReply(ctx context.Context, uid string, req *api.C
 
 func (s *CommentService) ListTopComments(ctx context.Context, viewerUid string, req *api.ListTopCommentsRequest) (*api.ListTopCommentsResponse, error) {
 	rows, err := s.db.ListTopComments(ctx, db.ListTopCommentsParams{
+		Viewer:          uuid.NullUUID{UUID: util.UUID(viewerUid), Valid: viewerUid != ""},
 		PostUid:         util.UUID(req.PostUid),
 		CursorCreatedAt: sql.NullTime{Time: time.Unix(req.CursorCreatedAt, 0).UTC(), Valid: req.CursorCreatedAt != 0},
 		CursorID:        uuid.NullUUID{UUID: util.UUID(req.CursorId), Valid: req.CursorId != ""},
@@ -119,6 +120,8 @@ func (s *CommentService) ListTopComments(ctx context.Context, viewerUid string, 
 			Content:          row.Content,
 			Images:           row.Images,
 			ReplyCount:       row.ReplyCount,
+			LikeCount:        row.LikeCount,
+			Liked:            row.Liked,
 			CreatedAt:        row.CreatedAt.Unix(),
 			UpdatedAt:        row.UpdatedAt.Unix(),
 		})
@@ -141,6 +144,7 @@ func (s *CommentService) ListTopComments(ctx context.Context, viewerUid string, 
 
 func (s *CommentService) ListReplies(ctx context.Context, viewerUid string, req *api.ListRepliesRequest) (*api.ListRepliesResponse, error) {
 	rows, err := s.db.ListReplies(ctx, db.ListRepliesParams{
+		Viewer:  uuid.NullUUID{UUID: util.UUID(viewerUid), Valid: viewerUid != ""},
 		RootUid: util.UUID(req.Uid),
 		Page:    req.Page,
 	})
@@ -172,6 +176,8 @@ func (s *CommentService) ListReplies(ctx context.Context, viewerUid string, req 
 			Content:          row.Content,
 			Images:           row.Images,
 			ReplyCount:       row.ReplyCount,
+			LikeCount:        row.LikeCount,
+			Liked:            row.Liked,
 			CreatedAt:        row.CreatedAt.Unix(),
 			UpdatedAt:        row.UpdatedAt.Unix(),
 		})
@@ -224,4 +230,33 @@ func (s *CommentService) DeleteComment(ctx context.Context, uid string, req *api
 		}
 		return nil
 	})
+}
+
+func (s *CommentService) LikeComment(ctx context.Context, uid string, req *api.LikeCommentRequest) (*api.LikeCommentResponse, error) {
+	commentUid := util.UUID(req.Uid)
+	userUid := util.UUID(uid)
+
+	var (
+		count int32
+		err   error
+	)
+
+	switch req.Action {
+	case api.CommentToggleAction_COMMENT_TOGGLE_ACTION_ADD:
+		count, err = s.db.AddCommentLike(ctx, db.AddCommentLikeParams{
+			CommentUid: commentUid,
+			UserUid:    userUid,
+		})
+	default:
+		count, err = s.db.RemoveCommentLike(ctx, db.RemoveCommentLikeParams{
+			CommentUid: commentUid,
+			UserUid:    userUid,
+		})
+	}
+	if err != nil {
+		return nil, fmt.Errorf("comment like: %w", err)
+	}
+	return &api.LikeCommentResponse{
+		Count: count,
+	}, nil
 }

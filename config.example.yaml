@@ -3,18 +3,18 @@ server:
   http_addr: ":8080"
 
 database:
-  dsn: "file:aeibi.db?_pragma=busy_timeout(5000)&cache=shared"
-  migrations_dir: "internal/repository/db/migration"
+  dsn: "postgres://aeibi:password@127.0.0.1:5432/aeibi?sslmode=disable"
+  migrations_source: "file://internal/repository/db/migration"
 
 oss:
   endpoint: ""
   access_key: ""
   secret_key: ""
-  bucket: ""
+  bucket: "aeibi"
   use_ssl: false
 
 auth:
   jwt_secret: ""
-  jwt_issuer: ""
-  jwt_ttl: "200s"
+  jwt_issuer: "aeibi"
+  jwt_ttl: "10s"
   refresh_ttl: "720h"

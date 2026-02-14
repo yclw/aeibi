@@ -242,7 +242,7 @@ func (s *CommentService) LikeComment(ctx context.Context, uid string, req *api.L
 	)
 
 	switch req.Action {
-	case api.CommentToggleAction_COMMENT_TOGGLE_ACTION_ADD:
+	case api.ToggleAction_TOGGLE_ACTION_ADD:
 		count, err = s.db.AddCommentLike(ctx, db.AddCommentLikeParams{
 			CommentUid: commentUid,
 			UserUid:    userUid,

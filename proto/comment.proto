@@ -7,6 +7,7 @@ option go_package = "aeibi/api;api";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
+import "common.proto";
 
 // CommentService
 service CommentService {
@@ -18,7 +19,7 @@ service CommentService {
     };
   }
 
-  // POST /api/v1/comments/{uid}/replies 回复评论
+  // POST /api/v1/comments/{parent_uid}/replies 回复评论
   rpc CreateReply(CreateReplyRequest) returns (CreateReplyResponse) {
     option (google.api.http) = {
       post: "/api/v1/comments/{parent_uid}/replies"
@@ -58,10 +59,11 @@ service CommentService {
 
 // -------------------- Messages --------------------
 
+// Models
 message CommentAuthor {
-  string uid          = 1 [(google.api.field_behavior) = REQUIRED];
-  string nickname     = 2 [(google.api.field_behavior) = REQUIRED];
-  string avatar_url   = 3 [(google.api.field_behavior) = REQUIRED];
+  string uid        = 1 [(google.api.field_behavior) = REQUIRED];
+  string nickname   = 2 [(google.api.field_behavior) = REQUIRED];
+  string avatar_url = 3 [(google.api.field_behavior) = REQUIRED];
 }
 
 message Comment {
@@ -78,11 +80,6 @@ message Comment {
   int64           updated_at          = 11 [(google.api.field_behavior) = REQUIRED];
   int32           like_count          = 12 [(google.api.field_behavior) = REQUIRED];
   bool            liked               = 13 [(google.api.field_behavior) = REQUIRED];
-}
-
-enum CommentToggleAction {
-  COMMENT_TOGGLE_ACTION_ADD    = 0;
-  COMMENT_TOGGLE_ACTION_REMOVE = 1;
 }
 
 // Create
@@ -143,7 +140,7 @@ message DeleteCommentRequest {
 
 message LikeCommentRequest {
   string              uid    = 1 [(google.api.field_behavior) = REQUIRED];
-  CommentToggleAction action = 2;
+  common.ToggleAction action = 2;
 }
 
 message LikeCommentResponse {

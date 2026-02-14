@@ -1,8 +1,9 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "comment.proto",
-    "version": "version not set"
+    "title": "Aeibi API",
+    "description": "Aeibi backend HTTP API documentation.",
+    "version": "v1"
   },
   "tags": [
     {
@@ -12,13 +13,13 @@
       "name": "FileService"
     },
     {
+      "name": "FollowService"
+    },
+    {
       "name": "PostService"
     },
     {
       "name": "UserService"
-    },
-    {
-      "name": "FollowService"
     }
   ],
   "consumes": [
@@ -96,7 +97,7 @@
     },
     "/api/v1/comments/{parentUid}/replies": {
       "post": {
-        "summary": "POST /api/v1/comments/{uid}/replies 回复评论",
+        "summary": "POST /api/v1/comments/{parent_uid}/replies 回复评论",
         "operationId": "CommentService_CreateReply",
         "responses": {
           "200": {
@@ -1095,7 +1096,7 @@
       "type": "object",
       "properties": {
         "action": {
-          "$ref": "#/definitions/commentCommentToggleAction"
+          "$ref": "#/definitions/commonToggleAction"
         }
       }
     },
@@ -1103,15 +1104,16 @@
       "type": "object",
       "properties": {
         "action": {
-          "$ref": "#/definitions/postToggleAction"
+          "$ref": "#/definitions/commonToggleAction"
         }
-      }
+      },
+      "title": "Follow"
     },
     "PostServiceCollectPostBody": {
       "type": "object",
       "properties": {
         "action": {
-          "$ref": "#/definitions/postToggleAction"
+          "$ref": "#/definitions/commonToggleAction"
         }
       }
     },
@@ -1119,7 +1121,7 @@
       "type": "object",
       "properties": {
         "action": {
-          "$ref": "#/definitions/postToggleAction"
+          "$ref": "#/definitions/commonToggleAction"
         }
       }
     },
@@ -1223,19 +1225,12 @@
           "type": "string"
         }
       },
+      "title": "Models",
       "required": [
         "uid",
         "nickname",
         "avatarUrl"
       ]
-    },
-    "commentCommentToggleAction": {
-      "type": "string",
-      "enum": [
-        "COMMENT_TOGGLE_ACTION_ADD",
-        "COMMENT_TOGGLE_ACTION_REMOVE"
-      ],
-      "default": "COMMENT_TOGGLE_ACTION_ADD"
     },
     "commentCreateReplyResponse": {
       "type": "object",
@@ -1330,6 +1325,58 @@
         "nextCursorId"
       ]
     },
+    "commonToggleAction": {
+      "type": "string",
+      "enum": [
+        "TOGGLE_ACTION_ADD",
+        "TOGGLE_ACTION_REMOVE"
+      ],
+      "default": "TOGGLE_ACTION_ADD",
+      "title": "Actions\nToggleAction 用于“添加/移除”类切换动作（点赞、收藏、关注等）。"
+    },
+    "commonUser": {
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "nickname": {
+          "type": "string"
+        },
+        "avatarUrl": {
+          "type": "string"
+        },
+        "followersCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "followingCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "isFollowing": {
+          "type": "boolean"
+        }
+      },
+      "title": "User",
+      "required": [
+        "uid",
+        "role",
+        "nickname",
+        "avatarUrl",
+        "followersCount",
+        "followingCount"
+      ]
+    },
     "fileFile": {
       "type": "object",
       "properties": {
@@ -1354,6 +1401,7 @@
           "format": "int64"
         }
       },
+      "title": "Models",
       "required": [
         "name",
         "contentType",
@@ -1395,6 +1443,7 @@
           "type": "string"
         }
       },
+      "title": "Upload",
       "required": [
         "data"
       ]
@@ -1438,7 +1487,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/userUser"
+            "$ref": "#/definitions/commonUser"
           }
         },
         "nextCursorCreatedAt": {
@@ -1462,7 +1511,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/userUser"
+            "$ref": "#/definitions/commonUser"
           }
         },
         "nextCursorCreatedAt": {
@@ -1719,20 +1768,13 @@
           "type": "boolean"
         }
       },
+      "title": "Models",
       "required": [
         "uid",
         "nickname",
         "avatarUrl",
         "isFollowing"
       ]
-    },
-    "postToggleAction": {
-      "type": "string",
-      "enum": [
-        "TOGGLE_ACTION_ADD",
-        "TOGGLE_ACTION_REMOVE"
-      ],
-      "default": "TOGGLE_ACTION_ADD"
     },
     "postUpdatePostBody": {
       "type": "object",
@@ -1821,7 +1863,7 @@
       "type": "object",
       "properties": {
         "user": {
-          "$ref": "#/definitions/userUser"
+          "$ref": "#/definitions/commonUser"
         }
       },
       "required": [
@@ -1832,7 +1874,7 @@
       "type": "object",
       "properties": {
         "user": {
-          "$ref": "#/definitions/userUser"
+          "$ref": "#/definitions/commonUser"
         }
       },
       "required": [
@@ -1926,48 +1968,6 @@
           "type": "string"
         }
       }
-    },
-    "userUser": {
-      "type": "object",
-      "properties": {
-        "uid": {
-          "type": "string"
-        },
-        "username": {
-          "type": "string"
-        },
-        "role": {
-          "type": "string"
-        },
-        "email": {
-          "type": "string"
-        },
-        "nickname": {
-          "type": "string"
-        },
-        "avatarUrl": {
-          "type": "string"
-        },
-        "followersCount": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "followingCount": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "isFollowing": {
-          "type": "boolean"
-        }
-      },
-      "required": [
-        "uid",
-        "role",
-        "nickname",
-        "avatarUrl",
-        "followersCount",
-        "followingCount"
-      ]
     }
   }
 }

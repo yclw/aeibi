@@ -8,6 +8,7 @@ import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/field_mask.proto";
+import "common.proto";
 
 // PostService
 service PostService {
@@ -95,6 +96,7 @@ service PostService {
 
 // -------------------- Messages --------------------
 
+// Models
 message PostAuthor {
   string uid          = 1 [(google.api.field_behavior) = REQUIRED];
   string nickname     = 2 [(google.api.field_behavior) = REQUIRED];
@@ -128,11 +130,6 @@ message Post {
   bool                collected         = 15 [(google.api.field_behavior) = REQUIRED];
   int64               created_at        = 16 [(google.api.field_behavior) = REQUIRED];
   int64               updated_at        = 17 [(google.api.field_behavior) = REQUIRED];
-}
-
-enum ToggleAction {
-  TOGGLE_ACTION_ADD    = 0;
-  TOGGLE_ACTION_REMOVE = 1;
 }
 
 // Create
@@ -205,8 +202,8 @@ message DeletePostRequest {
 // Like / Collect
 
 message LikePostRequest {
-  string       uid    = 1 [(google.api.field_behavior) = REQUIRED];
-  ToggleAction action = 2;
+  string              uid    = 1 [(google.api.field_behavior) = REQUIRED];
+  common.ToggleAction action = 2;
 }
 
 message LikePostResponse {
@@ -214,8 +211,8 @@ message LikePostResponse {
 }
 
 message CollectPostRequest {
-  string       uid    = 1 [(google.api.field_behavior) = REQUIRED];
-  ToggleAction action = 2;
+  string              uid    = 1 [(google.api.field_behavior) = REQUIRED];
+  common.ToggleAction action = 2;
 }
 
 message CollectPostResponse {

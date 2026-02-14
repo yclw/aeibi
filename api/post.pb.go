@@ -24,52 +24,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type ToggleAction int32
-
-const (
-	ToggleAction_TOGGLE_ACTION_ADD    ToggleAction = 0
-	ToggleAction_TOGGLE_ACTION_REMOVE ToggleAction = 1
-)
-
-// Enum value maps for ToggleAction.
-var (
-	ToggleAction_name = map[int32]string{
-		0: "TOGGLE_ACTION_ADD",
-		1: "TOGGLE_ACTION_REMOVE",
-	}
-	ToggleAction_value = map[string]int32{
-		"TOGGLE_ACTION_ADD":    0,
-		"TOGGLE_ACTION_REMOVE": 1,
-	}
-)
-
-func (x ToggleAction) Enum() *ToggleAction {
-	p := new(ToggleAction)
-	*p = x
-	return p
-}
-
-func (x ToggleAction) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (ToggleAction) Descriptor() protoreflect.EnumDescriptor {
-	return file_post_proto_enumTypes[0].Descriptor()
-}
-
-func (ToggleAction) Type() protoreflect.EnumType {
-	return &file_post_proto_enumTypes[0]
-}
-
-func (x ToggleAction) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use ToggleAction.Descriptor instead.
-func (ToggleAction) EnumDescriptor() ([]byte, []int) {
-	return file_post_proto_rawDescGZIP(), []int{0}
-}
-
+// Models
 type PostAuthor struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Uid           string                 `protobuf:"bytes,1,opt,name=uid,proto3" json:"uid,omitempty"`
@@ -965,7 +920,7 @@ func (x *DeletePostRequest) GetUid() string {
 type LikePostRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Uid           string                 `protobuf:"bytes,1,opt,name=uid,proto3" json:"uid,omitempty"`
-	Action        ToggleAction           `protobuf:"varint,2,opt,name=action,proto3,enum=post.ToggleAction" json:"action,omitempty"`
+	Action        ToggleAction           `protobuf:"varint,2,opt,name=action,proto3,enum=common.ToggleAction" json:"action,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1061,7 +1016,7 @@ func (x *LikePostResponse) GetCount() int32 {
 type CollectPostRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Uid           string                 `protobuf:"bytes,1,opt,name=uid,proto3" json:"uid,omitempty"`
-	Action        ToggleAction           `protobuf:"varint,2,opt,name=action,proto3,enum=post.ToggleAction" json:"action,omitempty"`
+	Action        ToggleAction           `protobuf:"varint,2,opt,name=action,proto3,enum=common.ToggleAction" json:"action,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1159,7 +1114,7 @@ var File_post_proto protoreflect.FileDescriptor
 const file_post_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"post.proto\x12\x04post\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a google/protobuf/field_mask.proto\"\x90\x01\n" +
+	"post.proto\x12\x04post\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a google/protobuf/field_mask.proto\x1a\fcommon.proto\"\x90\x01\n" +
 	"\n" +
 	"PostAuthor\x12\x15\n" +
 	"\x03uid\x18\x01 \x01(\tB\x03\xe0A\x02R\x03uid\x12\x1f\n" +
@@ -1241,20 +1196,17 @@ const file_post_proto_rawDesc = "" +
 	"\vupdate_mask\x18\x03 \x01(\v2\x1a.google.protobuf.FieldMaskB\x03\xe0A\x02R\n" +
 	"updateMask\"*\n" +
 	"\x11DeletePostRequest\x12\x15\n" +
-	"\x03uid\x18\x01 \x01(\tB\x03\xe0A\x02R\x03uid\"T\n" +
+	"\x03uid\x18\x01 \x01(\tB\x03\xe0A\x02R\x03uid\"V\n" +
 	"\x0fLikePostRequest\x12\x15\n" +
-	"\x03uid\x18\x01 \x01(\tB\x03\xe0A\x02R\x03uid\x12*\n" +
-	"\x06action\x18\x02 \x01(\x0e2\x12.post.ToggleActionR\x06action\"-\n" +
+	"\x03uid\x18\x01 \x01(\tB\x03\xe0A\x02R\x03uid\x12,\n" +
+	"\x06action\x18\x02 \x01(\x0e2\x14.common.ToggleActionR\x06action\"-\n" +
 	"\x10LikePostResponse\x12\x19\n" +
-	"\x05count\x18\x01 \x01(\x05B\x03\xe0A\x02R\x05count\"W\n" +
+	"\x05count\x18\x01 \x01(\x05B\x03\xe0A\x02R\x05count\"Y\n" +
 	"\x12CollectPostRequest\x12\x15\n" +
-	"\x03uid\x18\x01 \x01(\tB\x03\xe0A\x02R\x03uid\x12*\n" +
-	"\x06action\x18\x02 \x01(\x0e2\x12.post.ToggleActionR\x06action\"0\n" +
+	"\x03uid\x18\x01 \x01(\tB\x03\xe0A\x02R\x03uid\x12,\n" +
+	"\x06action\x18\x02 \x01(\x0e2\x14.common.ToggleActionR\x06action\"0\n" +
 	"\x13CollectPostResponse\x12\x19\n" +
-	"\x05count\x18\x01 \x01(\x05B\x03\xe0A\x02R\x05count*?\n" +
-	"\fToggleAction\x12\x15\n" +
-	"\x11TOGGLE_ACTION_ADD\x10\x00\x12\x18\n" +
-	"\x14TOGGLE_ACTION_REMOVE\x10\x012\xa7\b\n" +
+	"\x05count\x18\x01 \x01(\x05B\x03\xe0A\x02R\x05count2\xa7\b\n" +
 	"\vPostService\x12Y\n" +
 	"\n" +
 	"CreatePost\x12\x17.post.CreatePostRequest\x1a\x18.post.CreatePostResponse\"\x18\x82\xd3\xe4\x93\x02\x12:\x01*\"\r/api/v1/posts\x12S\n" +
@@ -1283,61 +1235,60 @@ func file_post_proto_rawDescGZIP() []byte {
 	return file_post_proto_rawDescData
 }
 
-var file_post_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_post_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
 var file_post_proto_goTypes = []any{
-	(ToggleAction)(0),                // 0: post.ToggleAction
-	(*PostAuthor)(nil),               // 1: post.PostAuthor
-	(*Attachment)(nil),               // 2: post.Attachment
-	(*Post)(nil),                     // 3: post.Post
-	(*CreatePostRequest)(nil),        // 4: post.CreatePostRequest
-	(*CreatePostResponse)(nil),       // 5: post.CreatePostResponse
-	(*ListPostsRequest)(nil),         // 6: post.ListPostsRequest
-	(*ListPostsByAuthorRequest)(nil), // 7: post.ListPostsByAuthorRequest
-	(*ListPostsResponse)(nil),        // 8: post.ListPostsResponse
-	(*GetPostRequest)(nil),           // 9: post.GetPostRequest
-	(*GetPostResponse)(nil),          // 10: post.GetPostResponse
-	(*UpdatePostBody)(nil),           // 11: post.UpdatePostBody
-	(*UpdatePostRequest)(nil),        // 12: post.UpdatePostRequest
-	(*DeletePostRequest)(nil),        // 13: post.DeletePostRequest
-	(*LikePostRequest)(nil),          // 14: post.LikePostRequest
-	(*LikePostResponse)(nil),         // 15: post.LikePostResponse
-	(*CollectPostRequest)(nil),       // 16: post.CollectPostRequest
-	(*CollectPostResponse)(nil),      // 17: post.CollectPostResponse
-	(*fieldmaskpb.FieldMask)(nil),    // 18: google.protobuf.FieldMask
+	(*PostAuthor)(nil),               // 0: post.PostAuthor
+	(*Attachment)(nil),               // 1: post.Attachment
+	(*Post)(nil),                     // 2: post.Post
+	(*CreatePostRequest)(nil),        // 3: post.CreatePostRequest
+	(*CreatePostResponse)(nil),       // 4: post.CreatePostResponse
+	(*ListPostsRequest)(nil),         // 5: post.ListPostsRequest
+	(*ListPostsByAuthorRequest)(nil), // 6: post.ListPostsByAuthorRequest
+	(*ListPostsResponse)(nil),        // 7: post.ListPostsResponse
+	(*GetPostRequest)(nil),           // 8: post.GetPostRequest
+	(*GetPostResponse)(nil),          // 9: post.GetPostResponse
+	(*UpdatePostBody)(nil),           // 10: post.UpdatePostBody
+	(*UpdatePostRequest)(nil),        // 11: post.UpdatePostRequest
+	(*DeletePostRequest)(nil),        // 12: post.DeletePostRequest
+	(*LikePostRequest)(nil),          // 13: post.LikePostRequest
+	(*LikePostResponse)(nil),         // 14: post.LikePostResponse
+	(*CollectPostRequest)(nil),       // 15: post.CollectPostRequest
+	(*CollectPostResponse)(nil),      // 16: post.CollectPostResponse
+	(*fieldmaskpb.FieldMask)(nil),    // 17: google.protobuf.FieldMask
+	(ToggleAction)(0),                // 18: common.ToggleAction
 	(*emptypb.Empty)(nil),            // 19: google.protobuf.Empty
 }
 var file_post_proto_depIdxs = []int32{
-	1,  // 0: post.Post.author:type_name -> post.PostAuthor
-	2,  // 1: post.Post.attachments:type_name -> post.Attachment
-	3,  // 2: post.ListPostsResponse.posts:type_name -> post.Post
-	3,  // 3: post.GetPostResponse.post:type_name -> post.Post
-	11, // 4: post.UpdatePostRequest.post:type_name -> post.UpdatePostBody
-	18, // 5: post.UpdatePostRequest.update_mask:type_name -> google.protobuf.FieldMask
-	0,  // 6: post.LikePostRequest.action:type_name -> post.ToggleAction
-	0,  // 7: post.CollectPostRequest.action:type_name -> post.ToggleAction
-	4,  // 8: post.PostService.CreatePost:input_type -> post.CreatePostRequest
-	6,  // 9: post.PostService.ListPosts:input_type -> post.ListPostsRequest
-	7,  // 10: post.PostService.ListPostsByAuthor:input_type -> post.ListPostsByAuthorRequest
-	6,  // 11: post.PostService.ListMyPosts:input_type -> post.ListPostsRequest
-	6,  // 12: post.PostService.ListMyCollections:input_type -> post.ListPostsRequest
-	9,  // 13: post.PostService.GetPost:input_type -> post.GetPostRequest
-	9,  // 14: post.PostService.GetMyPost:input_type -> post.GetPostRequest
-	12, // 15: post.PostService.UpdatePost:input_type -> post.UpdatePostRequest
-	13, // 16: post.PostService.DeletePost:input_type -> post.DeletePostRequest
-	14, // 17: post.PostService.LikePost:input_type -> post.LikePostRequest
-	16, // 18: post.PostService.CollectPost:input_type -> post.CollectPostRequest
-	5,  // 19: post.PostService.CreatePost:output_type -> post.CreatePostResponse
-	8,  // 20: post.PostService.ListPosts:output_type -> post.ListPostsResponse
-	8,  // 21: post.PostService.ListPostsByAuthor:output_type -> post.ListPostsResponse
-	8,  // 22: post.PostService.ListMyPosts:output_type -> post.ListPostsResponse
-	8,  // 23: post.PostService.ListMyCollections:output_type -> post.ListPostsResponse
-	10, // 24: post.PostService.GetPost:output_type -> post.GetPostResponse
-	10, // 25: post.PostService.GetMyPost:output_type -> post.GetPostResponse
+	0,  // 0: post.Post.author:type_name -> post.PostAuthor
+	1,  // 1: post.Post.attachments:type_name -> post.Attachment
+	2,  // 2: post.ListPostsResponse.posts:type_name -> post.Post
+	2,  // 3: post.GetPostResponse.post:type_name -> post.Post
+	10, // 4: post.UpdatePostRequest.post:type_name -> post.UpdatePostBody
+	17, // 5: post.UpdatePostRequest.update_mask:type_name -> google.protobuf.FieldMask
+	18, // 6: post.LikePostRequest.action:type_name -> common.ToggleAction
+	18, // 7: post.CollectPostRequest.action:type_name -> common.ToggleAction
+	3,  // 8: post.PostService.CreatePost:input_type -> post.CreatePostRequest
+	5,  // 9: post.PostService.ListPosts:input_type -> post.ListPostsRequest
+	6,  // 10: post.PostService.ListPostsByAuthor:input_type -> post.ListPostsByAuthorRequest
+	5,  // 11: post.PostService.ListMyPosts:input_type -> post.ListPostsRequest
+	5,  // 12: post.PostService.ListMyCollections:input_type -> post.ListPostsRequest
+	8,  // 13: post.PostService.GetPost:input_type -> post.GetPostRequest
+	8,  // 14: post.PostService.GetMyPost:input_type -> post.GetPostRequest
+	11, // 15: post.PostService.UpdatePost:input_type -> post.UpdatePostRequest
+	12, // 16: post.PostService.DeletePost:input_type -> post.DeletePostRequest
+	13, // 17: post.PostService.LikePost:input_type -> post.LikePostRequest
+	15, // 18: post.PostService.CollectPost:input_type -> post.CollectPostRequest
+	4,  // 19: post.PostService.CreatePost:output_type -> post.CreatePostResponse
+	7,  // 20: post.PostService.ListPosts:output_type -> post.ListPostsResponse
+	7,  // 21: post.PostService.ListPostsByAuthor:output_type -> post.ListPostsResponse
+	7,  // 22: post.PostService.ListMyPosts:output_type -> post.ListPostsResponse
+	7,  // 23: post.PostService.ListMyCollections:output_type -> post.ListPostsResponse
+	9,  // 24: post.PostService.GetPost:output_type -> post.GetPostResponse
+	9,  // 25: post.PostService.GetMyPost:output_type -> post.GetPostResponse
 	19, // 26: post.PostService.UpdatePost:output_type -> google.protobuf.Empty
 	19, // 27: post.PostService.DeletePost:output_type -> google.protobuf.Empty
-	15, // 28: post.PostService.LikePost:output_type -> post.LikePostResponse
-	17, // 29: post.PostService.CollectPost:output_type -> post.CollectPostResponse
+	14, // 28: post.PostService.LikePost:output_type -> post.LikePostResponse
+	16, // 29: post.PostService.CollectPost:output_type -> post.CollectPostResponse
 	19, // [19:30] is the sub-list for method output_type
 	8,  // [8:19] is the sub-list for method input_type
 	8,  // [8:8] is the sub-list for extension type_name
@@ -1350,19 +1301,19 @@ func file_post_proto_init() {
 	if File_post_proto != nil {
 		return
 	}
+	file_common_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_post_proto_rawDesc), len(file_post_proto_rawDesc)),
-			NumEnums:      1,
+			NumEnums:      0,
 			NumMessages:   17,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_post_proto_goTypes,
 		DependencyIndexes: file_post_proto_depIdxs,
-		EnumInfos:         file_post_proto_enumTypes,
 		MessageInfos:      file_post_proto_msgTypes,
 	}.Build()
 	File_post_proto = out.File

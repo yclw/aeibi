@@ -23,6 +23,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// Models
 type File struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
@@ -107,6 +108,7 @@ func (x *File) GetCreatedAt() int64 {
 	return 0
 }
 
+// Upload
 type UploadFileRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
@@ -227,6 +229,7 @@ func (x *UploadFileResponse) GetUrl() string {
 	return ""
 }
 
+// Meta
 type GetFileMetaRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Url           string                 `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
@@ -323,6 +326,7 @@ func (x *GetFileMetaResponse) GetUrl() string {
 	return ""
 }
 
+// Content
 type GetFileRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Url           string                 `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`

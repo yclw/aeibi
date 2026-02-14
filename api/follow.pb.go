@@ -22,10 +22,11 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// Follow
 type FollowRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Uid           string                 `protobuf:"bytes,1,opt,name=uid,proto3" json:"uid,omitempty"`
-	Action        ToggleAction           `protobuf:"varint,2,opt,name=action,proto3,enum=post.ToggleAction" json:"action,omitempty"`
+	Action        ToggleAction           `protobuf:"varint,2,opt,name=action,proto3,enum=common.ToggleAction" json:"action,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -126,6 +127,7 @@ func (x *FollowResponse) GetFollowersCount() int32 {
 	return 0
 }
 
+// List
 type ListMyFollowersRequest struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
 	CursorCreatedAt int64                  `protobuf:"varint,1,opt,name=cursor_created_at,json=cursorCreatedAt,proto3" json:"cursor_created_at,omitempty"` // unix seconds
@@ -354,29 +356,25 @@ var File_follow_proto protoreflect.FileDescriptor
 
 const file_follow_proto_rawDesc = "" +
 	"\n" +
-	"\ffollow.proto\x12\x06follow\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\n" +
-	"post.proto\x1a\n" +
-	"user.proto\"R\n" +
+	"\ffollow.proto\x12\x06follow\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\fcommon.proto\"T\n" +
 	"\rFollowRequest\x12\x15\n" +
-	"\x03uid\x18\x01 \x01(\tB\x03\xe0A\x02R\x03uid\x12*\n" +
-	"\x06action\x18\x02 \x01(\x0e2\x12.post.ToggleActionR\x06action\"l\n" +
+	"\x03uid\x18\x01 \x01(\tB\x03\xe0A\x02R\x03uid\x12,\n" +
+	"\x06action\x18\x02 \x01(\x0e2\x14.common.ToggleActionR\x06action\"l\n" +
 	"\x0eFollowResponse\x12,\n" +
 	"\x0ffollowing_count\x18\x01 \x01(\x05B\x03\xe0A\x02R\x0efollowingCount\x12,\n" +
 	"\x0ffollowers_count\x18\x02 \x01(\x05B\x03\xe0A\x02R\x0efollowersCount\"a\n" +
 	"\x16ListMyFollowersRequest\x12*\n" +
 	"\x11cursor_created_at\x18\x01 \x01(\x03R\x0fcursorCreatedAt\x12\x1b\n" +
-	"\tcursor_id\x18\x02 \x01(\tR\bcursorId\"\xa5\x01\n" +
-	"\x17ListMyFollowersResponse\x12%\n" +
-	"\x05users\x18\x01 \x03(\v2\n" +
-	".user.UserB\x03\xe0A\x02R\x05users\x128\n" +
+	"\tcursor_id\x18\x02 \x01(\tR\bcursorId\"\xa7\x01\n" +
+	"\x17ListMyFollowersResponse\x12'\n" +
+	"\x05users\x18\x01 \x03(\v2\f.common.UserB\x03\xe0A\x02R\x05users\x128\n" +
 	"\x16next_cursor_created_at\x18\x02 \x01(\x03B\x03\xe0A\x02R\x13nextCursorCreatedAt\x12)\n" +
 	"\x0enext_cursor_id\x18\x03 \x01(\tB\x03\xe0A\x02R\fnextCursorId\"a\n" +
 	"\x16ListMyFollowingRequest\x12*\n" +
 	"\x11cursor_created_at\x18\x01 \x01(\x03R\x0fcursorCreatedAt\x12\x1b\n" +
-	"\tcursor_id\x18\x02 \x01(\tR\bcursorId\"\xa5\x01\n" +
-	"\x17ListMyFollowingResponse\x12%\n" +
-	"\x05users\x18\x01 \x03(\v2\n" +
-	".user.UserB\x03\xe0A\x02R\x05users\x128\n" +
+	"\tcursor_id\x18\x02 \x01(\tR\bcursorId\"\xa7\x01\n" +
+	"\x17ListMyFollowingResponse\x12'\n" +
+	"\x05users\x18\x01 \x03(\v2\f.common.UserB\x03\xe0A\x02R\x05users\x128\n" +
 	"\x16next_cursor_created_at\x18\x02 \x01(\x03B\x03\xe0A\x02R\x13nextCursorCreatedAt\x12)\n" +
 	"\x0enext_cursor_id\x18\x03 \x01(\tB\x03\xe0A\x02R\fnextCursorId2\xd3\x02\n" +
 	"\rFollowService\x12^\n" +
@@ -404,13 +402,13 @@ var file_follow_proto_goTypes = []any{
 	(*ListMyFollowersResponse)(nil), // 3: follow.ListMyFollowersResponse
 	(*ListMyFollowingRequest)(nil),  // 4: follow.ListMyFollowingRequest
 	(*ListMyFollowingResponse)(nil), // 5: follow.ListMyFollowingResponse
-	(ToggleAction)(0),               // 6: post.ToggleAction
-	(*User)(nil),                    // 7: user.User
+	(ToggleAction)(0),               // 6: common.ToggleAction
+	(*User)(nil),                    // 7: common.User
 }
 var file_follow_proto_depIdxs = []int32{
-	6, // 0: follow.FollowRequest.action:type_name -> post.ToggleAction
-	7, // 1: follow.ListMyFollowersResponse.users:type_name -> user.User
-	7, // 2: follow.ListMyFollowingResponse.users:type_name -> user.User
+	6, // 0: follow.FollowRequest.action:type_name -> common.ToggleAction
+	7, // 1: follow.ListMyFollowersResponse.users:type_name -> common.User
+	7, // 2: follow.ListMyFollowingResponse.users:type_name -> common.User
 	0, // 3: follow.FollowService.Follow:input_type -> follow.FollowRequest
 	2, // 4: follow.FollowService.ListMyFollowers:input_type -> follow.ListMyFollowersRequest
 	4, // 5: follow.FollowService.ListMyFollowing:input_type -> follow.ListMyFollowingRequest
@@ -429,8 +427,7 @@ func file_follow_proto_init() {
 	if File_follow_proto != nil {
 		return
 	}
-	file_post_proto_init()
-	file_user_proto_init()
+	file_common_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

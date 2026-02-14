@@ -107,7 +107,7 @@ func (h *CommentHandler) LikeComment(ctx context.Context, req *api.LikeCommentRe
 		return nil, status.Error(codes.InvalidArgument, "uid is required")
 	}
 	switch req.Action {
-	case api.CommentToggleAction_COMMENT_TOGGLE_ACTION_ADD, api.CommentToggleAction_COMMENT_TOGGLE_ACTION_REMOVE:
+	case api.ToggleAction_TOGGLE_ACTION_ADD, api.ToggleAction_TOGGLE_ACTION_REMOVE:
 	default:
 		return nil, status.Error(codes.InvalidArgument, "action is invalid")
 	}

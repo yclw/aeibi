@@ -36,7 +36,7 @@ const (
 type CommentServiceClient interface {
 	// POST /api/v1/posts/{post_uid}/comments 创建一级评论
 	CreateTopComment(ctx context.Context, in *CreateTopCommentRequest, opts ...grpc.CallOption) (*CreateTopCommentResponse, error)
-	// POST /api/v1/comments/{uid}/replies 回复评论
+	// POST /api/v1/comments/{parent_uid}/replies 回复评论
 	CreateReply(ctx context.Context, in *CreateReplyRequest, opts ...grpc.CallOption) (*CreateReplyResponse, error)
 	// GET /api/v1/posts/{post_uid}/comments 一级评论列表
 	ListTopComments(ctx context.Context, in *ListTopCommentsRequest, opts ...grpc.CallOption) (*ListTopCommentsResponse, error)
@@ -124,7 +124,7 @@ func (c *commentServiceClient) LikeComment(ctx context.Context, in *LikeCommentR
 type CommentServiceServer interface {
 	// POST /api/v1/posts/{post_uid}/comments 创建一级评论
 	CreateTopComment(context.Context, *CreateTopCommentRequest) (*CreateTopCommentResponse, error)
-	// POST /api/v1/comments/{uid}/replies 回复评论
+	// POST /api/v1/comments/{parent_uid}/replies 回复评论
 	CreateReply(context.Context, *CreateReplyRequest) (*CreateReplyResponse, error)
 	// GET /api/v1/posts/{post_uid}/comments 一级评论列表
 	ListTopComments(context.Context, *ListTopCommentsRequest) (*ListTopCommentsResponse, error)

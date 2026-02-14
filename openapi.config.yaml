@@ -1,0 +1,12 @@
+openapiOptions:
+  file:
+    - file: common.proto
+      option:
+        info:
+          title: Aeibi API
+          version: v1
+          description: Aeibi backend HTTP API documentation.
+        consumes:
+          - application/json
+        produces:
+          - application/json

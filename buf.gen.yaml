@@ -9,9 +9,9 @@ plugins:
   - local: protoc-gen-grpc-gateway
     out: .
     opt: module=aeibi
-  - local: protoc-gen-openapiv2
-    out: api
+  - local: protoc-gen-openapi
+    out: api/openapi
+    strategy: all
     opt:
-      - allow_merge=true
-      - merge_file_name=openapi
-      - openapi_configuration=openapi.config.yaml
+      - fq_schema_naming=true
+      - default_response=false

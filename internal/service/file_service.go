@@ -36,7 +36,7 @@ func (s *FileService) UploadFile(ctx context.Context, uploader string, req *api.
 	if contentType == "" {
 		contentType = "application/octet-stream"
 	}
-	key := uuid.NewString() + path.Ext(req.Name)
+	key := "file/" + uuid.NewString() + path.Ext(req.Name)
 	if _, err := s.oss.PutObject(ctx, key, req.Data, contentType); err != nil {
 		return nil, fmt.Errorf("upload object: %w", err)
 	}

@@ -38,7 +38,7 @@ func (s *UserService) CreateUser(ctx context.Context, req *api.CreateUserRequest
 	if err != nil {
 		return fmt.Errorf("generate default avatar: %w", err)
 	}
-	avatarKey := fmt.Sprintf("avatars/%s.png", uid)
+	avatarKey := fmt.Sprintf("file/avatars/%s.png", uid)
 	passwordHash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return fmt.Errorf("hash password: %w", err)

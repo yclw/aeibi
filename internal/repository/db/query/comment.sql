@@ -18,7 +18,7 @@ VALUES (
     @parent_uid,
     @reply_to_author_uid,
     @content,
-    @images,
+    COALESCE(@images::text [], '{}'::text []),
     @ip
   )
 RETURNING id,
@@ -37,6 +37,30 @@ SELECT post_uid,
 FROM post_comments
 WHERE uid = @uid
   AND status = 'NORMAL'::comment_status
+LIMIT 1;
+-- name: GetCommentByUid :one
+SELECT c.uid,
+  u.uid AS author_uid,
+  u.nickname AS author_nickname,
+  u.avatar_url AS author_avatar_url,
+  c.post_uid,
+  c.root_uid,
+  c.parent_uid,
+  c.reply_to_author_uid,
+  c.content,
+  c.images,
+  c.reply_count,
+  c.like_count,
+  (cl.user_uid IS NOT NULL)::boolean AS liked,
+  c.created_at,
+  c.updated_at
+FROM post_comments c
+  JOIN users u ON u.uid = c.author_uid
+  AND u.status = 'NORMAL'::user_status
+  LEFT JOIN comment_likes cl ON cl.comment_uid = c.uid
+  AND cl.user_uid = sqlc.narg(viewer)::uuid
+WHERE c.status = 'NORMAL'::comment_status
+  AND c.uid = @uid
 LIMIT 1;
 -- name: AddCommentLike :one
 WITH inserted AS (

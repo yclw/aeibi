@@ -36,7 +36,7 @@ func (s *PostService) CreatePost(ctx context.Context, uid string, req *api.Creat
 			Text:        req.Text,
 			Images:      req.Images,
 			Attachments: req.Attachments,
-			Visibility:  db.PostVisibility(req.Visibility),
+			Visibility:  db.NullPostVisibility{PostVisibility: db.PostVisibility(req.Visibility), Valid: req.Visibility != ""},
 			Pinned:      req.Pinned,
 		})
 		if err != nil {

@@ -41,6 +41,13 @@ service CommentService {
     };
   }
 
+  // GET /api/v1/comments/{uid} 评论详情
+  rpc GetComment(GetCommentRequest) returns (GetCommentResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/comments/{uid}"
+    };
+  }
+
   // DELETE /api/v1/comments/{uid} 软删评论
   rpc DeleteComment(DeleteCommentRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
@@ -128,6 +135,16 @@ message ListRepliesResponse {
   repeated Comment comments = 1 [(google.api.field_behavior) = REQUIRED];
   int32            page     = 2 [(google.api.field_behavior) = REQUIRED];
   int32            total    = 3 [(google.api.field_behavior) = REQUIRED];
+}
+
+// Get
+
+message GetCommentRequest {
+  string uid = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message GetCommentResponse {
+  Comment comment = 1 [(google.api.field_behavior) = REQUIRED];
 }
 
 // Delete

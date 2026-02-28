@@ -195,6 +195,50 @@ func (s *CommentService) ListReplies(ctx context.Context, viewerUid string, req 
 	}, nil
 }
 
+func (s *CommentService) GetComment(ctx context.Context, viewerUid string, req *api.GetCommentRequest) (*api.GetCommentResponse, error) {
+	row, err := s.db.GetCommentByUid(ctx, db.GetCommentByUidParams{
+		Viewer: uuid.NullUUID{UUID: util.UUID(viewerUid), Valid: viewerUid != ""},
+		Uid:    util.UUID(req.Uid),
+	})
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, fmt.Errorf("comment not found")
+		}
+		return nil, fmt.Errorf("get comment: %w", err)
+	}
+
+	parentUid := ""
+	if row.ParentUid.Valid {
+		parentUid = row.ParentUid.UUID.String()
+	}
+	replyToAuthorUid := ""
+	if row.ReplyToAuthorUid.Valid {
+		replyToAuthorUid = row.ReplyToAuthorUid.UUID.String()
+	}
+
+	return &api.GetCommentResponse{
+		Comment: &api.Comment{
+			Uid: row.Uid.String(),
+			Author: &api.CommentAuthor{
+				Uid:       row.AuthorUid.String(),
+				Nickname:  row.AuthorNickname,
+				AvatarUrl: row.AuthorAvatarUrl,
+			},
+			PostUid:          row.PostUid.String(),
+			RootUid:          row.RootUid.String(),
+			ParentUid:        parentUid,
+			ReplyToAuthorUid: replyToAuthorUid,
+			Content:          row.Content,
+			Images:           row.Images,
+			ReplyCount:       row.ReplyCount,
+			LikeCount:        row.LikeCount,
+			Liked:            row.Liked,
+			CreatedAt:        row.CreatedAt.Unix(),
+			UpdatedAt:        row.UpdatedAt.Unix(),
+		},
+	}, nil
+}
+
 func (s *CommentService) DeleteComment(ctx context.Context, uid string, req *api.DeleteCommentRequest) error {
 	commentUid := util.UUID(req.Uid)
 	authorUid := util.UUID(uid)

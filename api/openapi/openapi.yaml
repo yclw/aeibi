@@ -70,6 +70,24 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/comment.CreateReplyResponse'
     /api/v1/comments/{uid}:
+        get:
+            tags:
+                - CommentService
+            description: GET /api/v1/comments/{uid} 评论详情
+            operationId: CommentService_GetComment
+            parameters:
+                - name: uid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/comment.GetCommentResponse'
         delete:
             tags:
                 - CommentService
@@ -713,6 +731,13 @@ components:
                 commentCount:
                     type: integer
                     format: int32
+        comment.GetCommentResponse:
+            required:
+                - comment
+            type: object
+            properties:
+                comment:
+                    $ref: '#/components/schemas/comment.Comment'
         comment.LikeCommentRequest:
             required:
                 - uid

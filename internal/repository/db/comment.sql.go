@@ -92,7 +92,7 @@ VALUES (
     $5,
     $6,
     $7,
-    $8,
+    COALESCE($8::text [], '{}'::text []),
     $9
   )
 RETURNING id,
@@ -163,6 +163,78 @@ func (q *Queries) DecrementPostCommentCount(ctx context.Context, postUid uuid.UU
 	var comment_count int32
 	err := row.Scan(&comment_count)
 	return comment_count, err
+}
+
+const getCommentByUid = `-- name: GetCommentByUid :one
+SELECT c.uid,
+  u.uid AS author_uid,
+  u.nickname AS author_nickname,
+  u.avatar_url AS author_avatar_url,
+  c.post_uid,
+  c.root_uid,
+  c.parent_uid,
+  c.reply_to_author_uid,
+  c.content,
+  c.images,
+  c.reply_count,
+  c.like_count,
+  (cl.user_uid IS NOT NULL)::boolean AS liked,
+  c.created_at,
+  c.updated_at
+FROM post_comments c
+  JOIN users u ON u.uid = c.author_uid
+  AND u.status = 'NORMAL'::user_status
+  LEFT JOIN comment_likes cl ON cl.comment_uid = c.uid
+  AND cl.user_uid = $1::uuid
+WHERE c.status = 'NORMAL'::comment_status
+  AND c.uid = $2
+LIMIT 1
+`
+
+type GetCommentByUidParams struct {
+	Viewer uuid.NullUUID
+	Uid    uuid.UUID
+}
+
+type GetCommentByUidRow struct {
+	Uid              uuid.UUID
+	AuthorUid        uuid.UUID
+	AuthorNickname   string
+	AuthorAvatarUrl  string
+	PostUid          uuid.UUID
+	RootUid          uuid.UUID
+	ParentUid        uuid.NullUUID
+	ReplyToAuthorUid uuid.NullUUID
+	Content          string
+	Images           []string
+	ReplyCount       int32
+	LikeCount        int32
+	Liked            bool
+	CreatedAt        time.Time
+	UpdatedAt        time.Time
+}
+
+func (q *Queries) GetCommentByUid(ctx context.Context, arg GetCommentByUidParams) (GetCommentByUidRow, error) {
+	row := q.db.QueryRowContext(ctx, getCommentByUid, arg.Viewer, arg.Uid)
+	var i GetCommentByUidRow
+	err := row.Scan(
+		&i.Uid,
+		&i.AuthorUid,
+		&i.AuthorNickname,
+		&i.AuthorAvatarUrl,
+		&i.PostUid,
+		&i.RootUid,
+		&i.ParentUid,
+		&i.ReplyToAuthorUid,
+		&i.Content,
+		pq.Array(&i.Images),
+		&i.ReplyCount,
+		&i.LikeCount,
+		&i.Liked,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
 }
 
 const getCommentMetaByUid = `-- name: GetCommentMetaByUid :one

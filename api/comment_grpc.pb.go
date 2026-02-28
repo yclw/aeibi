@@ -24,6 +24,7 @@ const (
 	CommentService_CreateReply_FullMethodName      = "/comment.CommentService/CreateReply"
 	CommentService_ListTopComments_FullMethodName  = "/comment.CommentService/ListTopComments"
 	CommentService_ListReplies_FullMethodName      = "/comment.CommentService/ListReplies"
+	CommentService_GetComment_FullMethodName       = "/comment.CommentService/GetComment"
 	CommentService_DeleteComment_FullMethodName    = "/comment.CommentService/DeleteComment"
 	CommentService_LikeComment_FullMethodName      = "/comment.CommentService/LikeComment"
 )
@@ -42,6 +43,8 @@ type CommentServiceClient interface {
 	ListTopComments(ctx context.Context, in *ListTopCommentsRequest, opts ...grpc.CallOption) (*ListTopCommentsResponse, error)
 	// GET /api/v1/comments/{uid}/replies 回复列表
 	ListReplies(ctx context.Context, in *ListRepliesRequest, opts ...grpc.CallOption) (*ListRepliesResponse, error)
+	// GET /api/v1/comments/{uid} 评论详情
+	GetComment(ctx context.Context, in *GetCommentRequest, opts ...grpc.CallOption) (*GetCommentResponse, error)
 	// DELETE /api/v1/comments/{uid} 软删评论
 	DeleteComment(ctx context.Context, in *DeleteCommentRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// POST /api/v1/comments/{uid}/like 点赞或取消赞
@@ -96,6 +99,16 @@ func (c *commentServiceClient) ListReplies(ctx context.Context, in *ListRepliesR
 	return out, nil
 }
 
+func (c *commentServiceClient) GetComment(ctx context.Context, in *GetCommentRequest, opts ...grpc.CallOption) (*GetCommentResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetCommentResponse)
+	err := c.cc.Invoke(ctx, CommentService_GetComment_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *commentServiceClient) DeleteComment(ctx context.Context, in *DeleteCommentRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
@@ -130,6 +143,8 @@ type CommentServiceServer interface {
 	ListTopComments(context.Context, *ListTopCommentsRequest) (*ListTopCommentsResponse, error)
 	// GET /api/v1/comments/{uid}/replies 回复列表
 	ListReplies(context.Context, *ListRepliesRequest) (*ListRepliesResponse, error)
+	// GET /api/v1/comments/{uid} 评论详情
+	GetComment(context.Context, *GetCommentRequest) (*GetCommentResponse, error)
 	// DELETE /api/v1/comments/{uid} 软删评论
 	DeleteComment(context.Context, *DeleteCommentRequest) (*emptypb.Empty, error)
 	// POST /api/v1/comments/{uid}/like 点赞或取消赞
@@ -155,6 +170,9 @@ func (UnimplementedCommentServiceServer) ListTopComments(context.Context, *ListT
 }
 func (UnimplementedCommentServiceServer) ListReplies(context.Context, *ListRepliesRequest) (*ListRepliesResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListReplies not implemented")
+}
+func (UnimplementedCommentServiceServer) GetComment(context.Context, *GetCommentRequest) (*GetCommentResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetComment not implemented")
 }
 func (UnimplementedCommentServiceServer) DeleteComment(context.Context, *DeleteCommentRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteComment not implemented")
@@ -255,6 +273,24 @@ func _CommentService_ListReplies_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CommentService_GetComment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetCommentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CommentServiceServer).GetComment(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CommentService_GetComment_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CommentServiceServer).GetComment(ctx, req.(*GetCommentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _CommentService_DeleteComment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeleteCommentRequest)
 	if err := dec(in); err != nil {
@@ -313,6 +349,10 @@ var CommentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListReplies",
 			Handler:    _CommentService_ListReplies_Handler,
+		},
+		{
+			MethodName: "GetComment",
+			Handler:    _CommentService_GetComment_Handler,
 		},
 		{
 			MethodName: "DeleteComment",

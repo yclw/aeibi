@@ -51,7 +51,10 @@ VALUES (
     $2,
     COALESCE($3::text [], '{}'::text []),
     COALESCE($4::text [], '{}'::text []),
-    $5,
+    COALESCE(
+      $5::post_visibility,
+      'PUBLIC'::post_visibility
+    ),
     $6,
     $7
   )
@@ -64,7 +67,7 @@ type CreatePostParams struct {
 	Text        string
 	Images      []string
 	Attachments []string
-	Visibility  PostVisibility
+	Visibility  NullPostVisibility
 	Pinned      bool
 	Ip          string
 }

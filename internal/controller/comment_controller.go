@@ -82,6 +82,17 @@ func (h *CommentHandler) ListReplies(ctx context.Context, req *api.ListRepliesRe
 	return h.svc.ListReplies(ctx, viewerUid, req)
 }
 
+func (h *CommentHandler) GetComment(ctx context.Context, req *api.GetCommentRequest) (*api.GetCommentResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "request is nil")
+	}
+	if req.Uid == "" {
+		return nil, status.Error(codes.InvalidArgument, "uid is required")
+	}
+	viewerUid, _ := auth.SubjectFromContext(ctx)
+	return h.svc.GetComment(ctx, viewerUid, req)
+}
+
 func (h *CommentHandler) DeleteComment(ctx context.Context, req *api.DeleteCommentRequest) (*emptypb.Empty, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "request is nil")

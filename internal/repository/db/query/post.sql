@@ -13,7 +13,10 @@ VALUES (
     @text,
     COALESCE(@images::text [], '{}'::text []),
     COALESCE(@attachments::text [], '{}'::text []),
-    @visibility,
+    COALESCE(
+      sqlc.narg(visibility)::post_visibility,
+      'PUBLIC'::post_visibility
+    ),
     @pinned,
     @ip
   )

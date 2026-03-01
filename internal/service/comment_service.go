@@ -69,6 +69,8 @@ func (s *CommentService) CreateReply(ctx context.Context, uid string, req *api.C
 			RootUid:          commentRow.RootUid,
 			ParentUid:        uuid.NullUUID{UUID: parentUid, Valid: true},
 			ReplyToAuthorUid: uuid.NullUUID{UUID: commentRow.AuthorUid, Valid: commentRow.RootUid == parentUid},
+			AuthorUid:        util.UUID(uid),
+			Content:          req.Content,
 		})
 		if err != nil {
 			return err

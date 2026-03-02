@@ -74,19 +74,19 @@ message CommentAuthor {
 }
 
 message Comment {
-  string          uid                 = 1 [(google.api.field_behavior) = REQUIRED];
-  CommentAuthor   author              = 2 [(google.api.field_behavior) = REQUIRED];
-  string          post_uid            = 3 [(google.api.field_behavior) = REQUIRED];
-  string          root_uid            = 4 [(google.api.field_behavior) = REQUIRED];
-  string          parent_uid          = 5;
-  string          reply_to_author_uid = 6;
-  string          content             = 7 [(google.api.field_behavior) = REQUIRED];
-  repeated string images              = 8 [(google.api.field_behavior) = REQUIRED];
-  int32           reply_count         = 9 [(google.api.field_behavior) = REQUIRED];
-  int64           created_at          = 10 [(google.api.field_behavior) = REQUIRED];
-  int64           updated_at          = 11 [(google.api.field_behavior) = REQUIRED];
-  int32           like_count          = 12 [(google.api.field_behavior) = REQUIRED];
-  bool            liked               = 13 [(google.api.field_behavior) = REQUIRED];
+  string          uid             = 1 [(google.api.field_behavior) = REQUIRED];
+  CommentAuthor   author          = 2 [(google.api.field_behavior) = REQUIRED];
+  string          post_uid        = 3 [(google.api.field_behavior) = REQUIRED];
+  string          root_uid        = 4 [(google.api.field_behavior) = REQUIRED];
+  string          parent_uid      = 5;
+  CommentAuthor   reply_to_author = 6;
+  string          content         = 7 [(google.api.field_behavior) = REQUIRED];
+  repeated string images          = 8 [(google.api.field_behavior) = REQUIRED];
+  int32           reply_count     = 9 [(google.api.field_behavior) = REQUIRED];
+  int64           created_at      = 10 [(google.api.field_behavior) = REQUIRED];
+  int64           updated_at      = 11 [(google.api.field_behavior) = REQUIRED];
+  int32           like_count      = 12 [(google.api.field_behavior) = REQUIRED];
+  bool            liked           = 13 [(google.api.field_behavior) = REQUIRED];
 }
 
 // Create

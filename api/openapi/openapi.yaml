@@ -651,8 +651,8 @@ components:
                     type: string
                 parentUid:
                     type: string
-                replyToAuthorUid:
-                    type: string
+                replyToAuthor:
+                    $ref: '#/components/schemas/comment.CommentAuthor'
                 content:
                     type: string
                 images:

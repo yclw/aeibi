@@ -85,22 +85,22 @@ func (x *CommentAuthor) GetAvatarUrl() string {
 }
 
 type Comment struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
-	Uid              string                 `protobuf:"bytes,1,opt,name=uid,proto3" json:"uid,omitempty"`
-	Author           *CommentAuthor         `protobuf:"bytes,2,opt,name=author,proto3" json:"author,omitempty"`
-	PostUid          string                 `protobuf:"bytes,3,opt,name=post_uid,json=postUid,proto3" json:"post_uid,omitempty"`
-	RootUid          string                 `protobuf:"bytes,4,opt,name=root_uid,json=rootUid,proto3" json:"root_uid,omitempty"`
-	ParentUid        string                 `protobuf:"bytes,5,opt,name=parent_uid,json=parentUid,proto3" json:"parent_uid,omitempty"`
-	ReplyToAuthorUid string                 `protobuf:"bytes,6,opt,name=reply_to_author_uid,json=replyToAuthorUid,proto3" json:"reply_to_author_uid,omitempty"`
-	Content          string                 `protobuf:"bytes,7,opt,name=content,proto3" json:"content,omitempty"`
-	Images           []string               `protobuf:"bytes,8,rep,name=images,proto3" json:"images,omitempty"`
-	ReplyCount       int32                  `protobuf:"varint,9,opt,name=reply_count,json=replyCount,proto3" json:"reply_count,omitempty"`
-	CreatedAt        int64                  `protobuf:"varint,10,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt        int64                  `protobuf:"varint,11,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
-	LikeCount        int32                  `protobuf:"varint,12,opt,name=like_count,json=likeCount,proto3" json:"like_count,omitempty"`
-	Liked            bool                   `protobuf:"varint,13,opt,name=liked,proto3" json:"liked,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Uid           string                 `protobuf:"bytes,1,opt,name=uid,proto3" json:"uid,omitempty"`
+	Author        *CommentAuthor         `protobuf:"bytes,2,opt,name=author,proto3" json:"author,omitempty"`
+	PostUid       string                 `protobuf:"bytes,3,opt,name=post_uid,json=postUid,proto3" json:"post_uid,omitempty"`
+	RootUid       string                 `protobuf:"bytes,4,opt,name=root_uid,json=rootUid,proto3" json:"root_uid,omitempty"`
+	ParentUid     string                 `protobuf:"bytes,5,opt,name=parent_uid,json=parentUid,proto3" json:"parent_uid,omitempty"`
+	ReplyToAuthor *CommentAuthor         `protobuf:"bytes,6,opt,name=reply_to_author,json=replyToAuthor,proto3" json:"reply_to_author,omitempty"`
+	Content       string                 `protobuf:"bytes,7,opt,name=content,proto3" json:"content,omitempty"`
+	Images        []string               `protobuf:"bytes,8,rep,name=images,proto3" json:"images,omitempty"`
+	ReplyCount    int32                  `protobuf:"varint,9,opt,name=reply_count,json=replyCount,proto3" json:"reply_count,omitempty"`
+	CreatedAt     int64                  `protobuf:"varint,10,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt     int64                  `protobuf:"varint,11,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	LikeCount     int32                  `protobuf:"varint,12,opt,name=like_count,json=likeCount,proto3" json:"like_count,omitempty"`
+	Liked         bool                   `protobuf:"varint,13,opt,name=liked,proto3" json:"liked,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Comment) Reset() {
@@ -168,11 +168,11 @@ func (x *Comment) GetParentUid() string {
 	return ""
 }
 
-func (x *Comment) GetReplyToAuthorUid() string {
+func (x *Comment) GetReplyToAuthor() *CommentAuthor {
 	if x != nil {
-		return x.ReplyToAuthorUid
+		return x.ReplyToAuthor
 	}
-	return ""
+	return nil
 }
 
 func (x *Comment) GetContent() string {
@@ -909,15 +909,15 @@ const file_comment_proto_rawDesc = "" +
 	"\x03uid\x18\x01 \x01(\tB\x03\xe0A\x02R\x03uid\x12\x1f\n" +
 	"\bnickname\x18\x02 \x01(\tB\x03\xe0A\x02R\bnickname\x12\"\n" +
 	"\n" +
-	"avatar_url\x18\x03 \x01(\tB\x03\xe0A\x02R\tavatarUrl\"\xcc\x03\n" +
+	"avatar_url\x18\x03 \x01(\tB\x03\xe0A\x02R\tavatarUrl\"\xdd\x03\n" +
 	"\aComment\x12\x15\n" +
 	"\x03uid\x18\x01 \x01(\tB\x03\xe0A\x02R\x03uid\x123\n" +
 	"\x06author\x18\x02 \x01(\v2\x16.comment.CommentAuthorB\x03\xe0A\x02R\x06author\x12\x1e\n" +
 	"\bpost_uid\x18\x03 \x01(\tB\x03\xe0A\x02R\apostUid\x12\x1e\n" +
 	"\broot_uid\x18\x04 \x01(\tB\x03\xe0A\x02R\arootUid\x12\x1d\n" +
 	"\n" +
-	"parent_uid\x18\x05 \x01(\tR\tparentUid\x12-\n" +
-	"\x13reply_to_author_uid\x18\x06 \x01(\tR\x10replyToAuthorUid\x12\x1d\n" +
+	"parent_uid\x18\x05 \x01(\tR\tparentUid\x12>\n" +
+	"\x0freply_to_author\x18\x06 \x01(\v2\x16.comment.CommentAuthorR\rreplyToAuthor\x12\x1d\n" +
 	"\acontent\x18\a \x01(\tB\x03\xe0A\x02R\acontent\x12\x1b\n" +
 	"\x06images\x18\b \x03(\tB\x03\xe0A\x02R\x06images\x12$\n" +
 	"\vreply_count\x18\t \x01(\x05B\x03\xe0A\x02R\n" +
@@ -1015,29 +1015,30 @@ var file_comment_proto_goTypes = []any{
 }
 var file_comment_proto_depIdxs = []int32{
 	0,  // 0: comment.Comment.author:type_name -> comment.CommentAuthor
-	1,  // 1: comment.ListTopCommentsResponse.comments:type_name -> comment.Comment
-	1,  // 2: comment.ListRepliesResponse.comments:type_name -> comment.Comment
-	1,  // 3: comment.GetCommentResponse.comment:type_name -> comment.Comment
-	15, // 4: comment.LikeCommentRequest.action:type_name -> common.ToggleAction
-	2,  // 5: comment.CommentService.CreateTopComment:input_type -> comment.CreateTopCommentRequest
-	4,  // 6: comment.CommentService.CreateReply:input_type -> comment.CreateReplyRequest
-	6,  // 7: comment.CommentService.ListTopComments:input_type -> comment.ListTopCommentsRequest
-	8,  // 8: comment.CommentService.ListReplies:input_type -> comment.ListRepliesRequest
-	10, // 9: comment.CommentService.GetComment:input_type -> comment.GetCommentRequest
-	12, // 10: comment.CommentService.DeleteComment:input_type -> comment.DeleteCommentRequest
-	13, // 11: comment.CommentService.LikeComment:input_type -> comment.LikeCommentRequest
-	3,  // 12: comment.CommentService.CreateTopComment:output_type -> comment.CreateTopCommentResponse
-	5,  // 13: comment.CommentService.CreateReply:output_type -> comment.CreateReplyResponse
-	7,  // 14: comment.CommentService.ListTopComments:output_type -> comment.ListTopCommentsResponse
-	9,  // 15: comment.CommentService.ListReplies:output_type -> comment.ListRepliesResponse
-	11, // 16: comment.CommentService.GetComment:output_type -> comment.GetCommentResponse
-	16, // 17: comment.CommentService.DeleteComment:output_type -> google.protobuf.Empty
-	14, // 18: comment.CommentService.LikeComment:output_type -> comment.LikeCommentResponse
-	12, // [12:19] is the sub-list for method output_type
-	5,  // [5:12] is the sub-list for method input_type
-	5,  // [5:5] is the sub-list for extension type_name
-	5,  // [5:5] is the sub-list for extension extendee
-	0,  // [0:5] is the sub-list for field type_name
+	0,  // 1: comment.Comment.reply_to_author:type_name -> comment.CommentAuthor
+	1,  // 2: comment.ListTopCommentsResponse.comments:type_name -> comment.Comment
+	1,  // 3: comment.ListRepliesResponse.comments:type_name -> comment.Comment
+	1,  // 4: comment.GetCommentResponse.comment:type_name -> comment.Comment
+	15, // 5: comment.LikeCommentRequest.action:type_name -> common.ToggleAction
+	2,  // 6: comment.CommentService.CreateTopComment:input_type -> comment.CreateTopCommentRequest
+	4,  // 7: comment.CommentService.CreateReply:input_type -> comment.CreateReplyRequest
+	6,  // 8: comment.CommentService.ListTopComments:input_type -> comment.ListTopCommentsRequest
+	8,  // 9: comment.CommentService.ListReplies:input_type -> comment.ListRepliesRequest
+	10, // 10: comment.CommentService.GetComment:input_type -> comment.GetCommentRequest
+	12, // 11: comment.CommentService.DeleteComment:input_type -> comment.DeleteCommentRequest
+	13, // 12: comment.CommentService.LikeComment:input_type -> comment.LikeCommentRequest
+	3,  // 13: comment.CommentService.CreateTopComment:output_type -> comment.CreateTopCommentResponse
+	5,  // 14: comment.CommentService.CreateReply:output_type -> comment.CreateReplyResponse
+	7,  // 15: comment.CommentService.ListTopComments:output_type -> comment.ListTopCommentsResponse
+	9,  // 16: comment.CommentService.ListReplies:output_type -> comment.ListRepliesResponse
+	11, // 17: comment.CommentService.GetComment:output_type -> comment.GetCommentResponse
+	16, // 18: comment.CommentService.DeleteComment:output_type -> google.protobuf.Empty
+	14, // 19: comment.CommentService.LikeComment:output_type -> comment.LikeCommentResponse
+	13, // [13:20] is the sub-list for method output_type
+	6,  // [6:13] is the sub-list for method input_type
+	6,  // [6:6] is the sub-list for extension type_name
+	6,  // [6:6] is the sub-list for extension extendee
+	0,  // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_comment_proto_init() }

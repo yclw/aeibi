@@ -68,7 +68,7 @@ func (s *CommentService) CreateReply(ctx context.Context, uid string, req *api.C
 			PostUid:          commentRow.PostUid,
 			RootUid:          commentRow.RootUid,
 			ParentUid:        uuid.NullUUID{UUID: parentUid, Valid: true},
-			ReplyToAuthorUid: uuid.NullUUID{UUID: commentRow.AuthorUid, Valid: commentRow.RootUid == parentUid},
+			ReplyToAuthorUid: uuid.NullUUID{UUID: commentRow.AuthorUid, Valid: commentRow.RootUid != parentUid},
 			AuthorUid:        util.UUID(uid),
 			Content:          req.Content,
 		})
@@ -104,9 +104,13 @@ func (s *CommentService) ListTopComments(ctx context.Context, viewerUid string, 
 		if row.ParentUid.Valid {
 			parentUid = row.ParentUid.UUID.String()
 		}
-		replyToAuthorUid := ""
-		if row.ReplyToAuthorUid.Valid {
-			replyToAuthorUid = row.ReplyToAuthorUid.UUID.String()
+		var replyToAuthor *api.CommentAuthor
+		if row.ReplyToAuthorUid.Valid && row.ReplyToAuthorNickname.Valid && row.ReplyToAuthorAvatarUrl.Valid {
+			replyToAuthor = &api.CommentAuthor{
+				Uid:       row.ReplyToAuthorUid.UUID.String(),
+				Nickname:  row.ReplyToAuthorNickname.String,
+				AvatarUrl: row.ReplyToAuthorAvatarUrl.String,
+			}
 		}
 		comments = append(comments, &api.Comment{
 			Uid: row.Uid.String(),
@@ -115,17 +119,17 @@ func (s *CommentService) ListTopComments(ctx context.Context, viewerUid string, 
 				Nickname:  row.AuthorNickname,
 				AvatarUrl: row.AuthorAvatarUrl,
 			},
-			PostUid:          row.PostUid.String(),
-			RootUid:          row.RootUid.String(),
-			ParentUid:        parentUid,
-			ReplyToAuthorUid: replyToAuthorUid,
-			Content:          row.Content,
-			Images:           row.Images,
-			ReplyCount:       row.ReplyCount,
-			LikeCount:        row.LikeCount,
-			Liked:            row.Liked,
-			CreatedAt:        row.CreatedAt.Unix(),
-			UpdatedAt:        row.UpdatedAt.Unix(),
+			PostUid:       row.PostUid.String(),
+			RootUid:       row.RootUid.String(),
+			ParentUid:     parentUid,
+			ReplyToAuthor: replyToAuthor,
+			Content:       row.Content,
+			Images:        row.Images,
+			ReplyCount:    row.ReplyCount,
+			LikeCount:     row.LikeCount,
+			Liked:         row.Liked,
+			CreatedAt:     row.CreatedAt.Unix(),
+			UpdatedAt:     row.UpdatedAt.Unix(),
 		})
 	}
 
@@ -160,9 +164,13 @@ func (s *CommentService) ListReplies(ctx context.Context, viewerUid string, req 
 		if row.ParentUid.Valid {
 			parentUid = row.ParentUid.UUID.String()
 		}
-		replyToAuthorUid := ""
-		if row.ReplyToAuthorUid.Valid {
-			replyToAuthorUid = row.ReplyToAuthorUid.UUID.String()
+		var replyToAuthor *api.CommentAuthor
+		if row.ReplyToAuthorUid.Valid && row.ReplyToAuthorNickname.Valid && row.ReplyToAuthorAvatarUrl.Valid {
+			replyToAuthor = &api.CommentAuthor{
+				Uid:       row.ReplyToAuthorUid.UUID.String(),
+				Nickname:  row.ReplyToAuthorNickname.String,
+				AvatarUrl: row.ReplyToAuthorAvatarUrl.String,
+			}
 		}
 		comments = append(comments, &api.Comment{
 			Uid: row.Uid.String(),
@@ -171,17 +179,17 @@ func (s *CommentService) ListReplies(ctx context.Context, viewerUid string, req 
 				Nickname:  row.AuthorNickname,
 				AvatarUrl: row.AuthorAvatarUrl,
 			},
-			PostUid:          row.PostUid.String(),
-			RootUid:          row.RootUid.String(),
-			ParentUid:        parentUid,
-			ReplyToAuthorUid: replyToAuthorUid,
-			Content:          row.Content,
-			Images:           row.Images,
-			ReplyCount:       row.ReplyCount,
-			LikeCount:        row.LikeCount,
-			Liked:            row.Liked,
-			CreatedAt:        row.CreatedAt.Unix(),
-			UpdatedAt:        row.UpdatedAt.Unix(),
+			PostUid:       row.PostUid.String(),
+			RootUid:       row.RootUid.String(),
+			ParentUid:     parentUid,
+			ReplyToAuthor: replyToAuthor,
+			Content:       row.Content,
+			Images:        row.Images,
+			ReplyCount:    row.ReplyCount,
+			LikeCount:     row.LikeCount,
+			Liked:         row.Liked,
+			CreatedAt:     row.CreatedAt.Unix(),
+			UpdatedAt:     row.UpdatedAt.Unix(),
 		})
 	}
 
@@ -213,9 +221,13 @@ func (s *CommentService) GetComment(ctx context.Context, viewerUid string, req *
 	if row.ParentUid.Valid {
 		parentUid = row.ParentUid.UUID.String()
 	}
-	replyToAuthorUid := ""
-	if row.ReplyToAuthorUid.Valid {
-		replyToAuthorUid = row.ReplyToAuthorUid.UUID.String()
+	var replyToAuthor *api.CommentAuthor
+	if row.ReplyToAuthorUid.Valid && row.ReplyToAuthorNickname.Valid && row.ReplyToAuthorAvatarUrl.Valid {
+		replyToAuthor = &api.CommentAuthor{
+			Uid:       row.ReplyToAuthorUid.UUID.String(),
+			Nickname:  row.ReplyToAuthorNickname.String,
+			AvatarUrl: row.ReplyToAuthorAvatarUrl.String,
+		}
 	}
 
 	return &api.GetCommentResponse{
@@ -226,17 +238,17 @@ func (s *CommentService) GetComment(ctx context.Context, viewerUid string, req *
 				Nickname:  row.AuthorNickname,
 				AvatarUrl: row.AuthorAvatarUrl,
 			},
-			PostUid:          row.PostUid.String(),
-			RootUid:          row.RootUid.String(),
-			ParentUid:        parentUid,
-			ReplyToAuthorUid: replyToAuthorUid,
-			Content:          row.Content,
-			Images:           row.Images,
-			ReplyCount:       row.ReplyCount,
-			LikeCount:        row.LikeCount,
-			Liked:            row.Liked,
-			CreatedAt:        row.CreatedAt.Unix(),
-			UpdatedAt:        row.UpdatedAt.Unix(),
+			PostUid:       row.PostUid.String(),
+			RootUid:       row.RootUid.String(),
+			ParentUid:     parentUid,
+			ReplyToAuthor: replyToAuthor,
+			Content:       row.Content,
+			Images:        row.Images,
+			ReplyCount:    row.ReplyCount,
+			LikeCount:     row.LikeCount,
+			Liked:         row.Liked,
+			CreatedAt:     row.CreatedAt.Unix(),
+			UpdatedAt:     row.UpdatedAt.Unix(),
 		},
 	}, nil
 }
